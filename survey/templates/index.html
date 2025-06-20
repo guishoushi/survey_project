@@ -1,0 +1,835 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西点家庭教育在线测试</title>
+    <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
+    <script src="{% static 'js/marked.min.js' %}"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, #5c6bc0, #7e57c2);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        header h1 i {
+            margin-right: 12px;
+            font-size: 1.8rem;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .quiz-info {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 20px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-item span {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #7e57c2;
+        }
+
+        .question-container {
+            padding: 30px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .question {
+            font-size: 1.35rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #2c3e50;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #7e57c2;
+            margin-bottom: 8px;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 16px 20px;
+            background-color: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background-color: #edecff;
+            border-color: #b3a2e8;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background-color: #e3f2fd;
+            border-color: #5c6bc0;
+            box-shadow: 0 4px 8px rgba(92, 107, 192, 0.2);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            accent-color: #5c6bc0;
+            transform: scale(1.3);
+        }
+
+        .option label {
+            cursor: pointer;
+            font-size: 1.1rem;
+            flex-grow: 1;
+        }
+
+        .button-container {
+            padding: 20px 30px 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        button i {
+            margin-right: 10px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .prev-btn {
+            background-color: #e0e0e0;
+            color: #616161;
+        }
+
+        .prev-btn:hover:not(:disabled) {
+            background-color: #bdbdbd;
+        }
+
+        .next-btn {
+            background: linear-gradient(to right, #5c6bc0, #7e57c2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(92, 107, 192, 0.4);
+        }
+
+        .next-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(92, 107, 192, 0.5);
+        }
+
+        .submit-btn {
+            background: linear-gradient(to right, #4caf50, #2e7d32);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .next-btn:disabled, .submit-btn:disabled {
+            background: linear-gradient(to right, #bdbdbd, #9e9e9e);
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(76, 175, 80, 0.5);
+        }
+
+        .completion-notice {
+            display: none;
+            padding: 40px;
+            text-align: center;
+            color: #444;
+        }
+
+        .completion-icon {
+            font-size: 5rem;
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        .completion-notice h2 {
+            color: #5c6bc0;
+            margin-bottom: 25px;
+        }
+
+        .review-container {
+            text-align: left;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+        }
+
+        .review-item {
+            padding: 15px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+
+        .review-question {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #3f51b5;
+        }
+
+        .review-answer {
+            color: #4caf50;
+        }
+
+        .processing-msg {
+            font-style: italic;
+            color: #777;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .restart-btn {
+            background: linear-gradient(to right, #ff9800, #f57c00);
+            color: white;
+            padding: 16px 45px;
+            font-size: 1.2rem;
+            margin: 20px auto 0;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(245, 124, 0, 0.4);
+        }
+
+        .result-container {
+            max-width: 800px;
+            margin: 25px auto;
+            padding: 25px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            text-align: left;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .result-container h1 {
+            color: #5c6bc0;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+
+        .result-container h2 {
+            color: #7e57c2;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .result-container h3 {
+            color: #9575cd;
+            margin-top: 30px;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+
+        .result-container h4 {
+            color: #b39ddb;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .result-container p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .result-container ul,
+        .result-container ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        .result-container li {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .result-container blockquote {
+            background-color: #f8f8ff;
+            border-left: 4px solid #7e57c2;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #555;
+        }
+
+        .result-container pre {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 25px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: #f8f8f2;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        .result-container code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            background-color: rgba(92, 107, 192, 0.12);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: #d63384;
+        }
+
+        .result-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-container th {
+            background-color: #f0f4ff;
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #5c6bc0;
+            border-bottom: 2px solid #e0e0f0;
+        }
+
+        .result-container td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .result-container tr:nth-child(even) {
+            background-color: #f9f9ff;
+        }
+
+        .result-container a {
+            color: #5c6bc0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .result-container a:hover {
+            color: #ff7043;
+            text-decoration: underline;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fdfcff, #f0f2ff);
+            border: 1px solid #e0e0ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: 0 3px 10px rgba(94, 53, 177, 0.08);
+        }
+
+        .emoji {
+            font-size: 1.2rem;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 600px) {
+            .result-container {
+                padding: 15px;
+                margin: 15px;
+            }
+
+            .result-container h1 {
+                font-size: 1.6rem;
+            }
+
+            .result-container h2 {
+                font-size: 1.3rem;
+            }
+
+            .result-container pre {
+                padding: 12px;
+                font-size: 0.85rem;
+            }
+
+            .result-container table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        .course-access-btn {
+            background: linear-gradient(to right, #2ec4b6, #1a936f);
+            color: white;
+            padding: 16px 45px;
+            font-size: 1.2rem;
+            margin: 20px auto 0;
+        }
+
+        .course-access-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgb(83 168 146);
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><i class="fas fa-users"></i> 家庭教育在线测试</h1>
+        <p>请从下列选项中选择一个最合适的答案</p>
+    </header>
+
+    <div class="quiz-info">
+        <div class="info-item">
+            <span id="question-count">5</span> 总题数
+        </div>
+        <div class="info-item">
+            <span id="current-number">1</span> 当前题号
+        </div>
+        <div class="info-item">
+            <span id="answered-count">0</span> 已回答
+        </div>
+    </div>
+
+    <div class="question-container">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <div class="question" id="question">问题加载中...</div>
+
+        <div class="options" id="options">
+            <!-- 选项会由JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button class="prev-btn" id="prev-btn" disabled>
+            <i class="fas fa-arrow-left"></i>上一题
+        </button>
+        <button class="next-btn" id="next-btn">
+            下一题 <i class="fas fa-arrow-right"></i>
+        </button>
+        <button class="submit-btn" id="submit-btn" style="display: none;">
+            <i class="fas fa-paper-plane"></i>提交答案
+        </button>
+    </div>
+
+    <div class="completion-notice" id="completion-notice">
+        <div class="completion-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>测试已完成!</h2>
+        <p>您的回答已成功收集，以下是回答摘要：</p>
+
+        <div class="review-container" id="review-container">
+            <!-- 回答摘要将在此动态生成 -->
+        </div>
+
+        <div class="processing-msg">
+            <i class="fas fa-sync fa-spin"></i> 正在将您的回答提交给AI进行分析...
+        </div>
+        <div class="result-container" id="result-container">
+            <!-- Markdown内容将通过JS动态渲染 -->
+        </div>
+        <div style="display: flex">
+            <button class="restart-btn" id="restart-btn" disabled>
+                <i class="fas fa-redo"></i>重新测试
+            </button>
+            <button class="course-access-btn"
+                    aria-label="了解课程"
+                    title="点击了解课程详情" disabled>
+                <i class="fas fa-compass"></i> 了解课程
+            </button>
+
+        </div>
+
+
+    </div>
+</div>
+{% csrf_token %}
+<script>
+    // 示例测试数据
+    const quizData = JSON.parse("{{ quiz_data|escapejs }}");
+
+    // DOM 元素
+    const questionCountEl = document.getElementById('question-count');
+    const currentNumberEl = document.getElementById('current-number');
+    const answeredCountEl = document.getElementById('answered-count');
+    const progressEl = document.getElementById('progress');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const completionNotice = document.getElementById('completion-notice');
+    const reviewContainer = document.getElementById('review-container');
+    const restartBtn = document.getElementById('restart-btn');
+    const resultContainer = document.getElementById('result-container');
+
+    // 初始化变量
+    let currentQuestion = 0;
+    let userAnswers = Array(quizData.length).fill(-1);
+    let answeredCount = 0;
+
+    // 设置问题数量
+    questionCountEl.textContent = quizData.length;
+
+    // 加载问题
+    function loadQuestion() {
+        const currentQuiz = quizData[currentQuestion];
+
+        currentNumberEl.textContent = currentQuestion + 1;
+        questionEl.innerHTML = `<div class="question-number">第 ${currentQuestion + 1} 题</div>${currentQuiz.question}`;
+
+        optionsEl.innerHTML = '';
+        currentQuiz.options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.classList.add('option');
+
+            if (userAnswers[currentQuestion] === index) {
+                optionElement.classList.add('selected');
+            }
+
+            optionElement.innerHTML = `
+                    <input type="radio" name="option" id="option${index}" value="${index}"
+                        ${userAnswers[currentQuestion] === index ? 'checked' : ''}>
+                    <label for="option${index}">${option.text}</label>
+                `;
+
+            optionElement.addEventListener('click', () => {
+                selectOption(optionElement, index);
+            });
+
+            optionsEl.appendChild(optionElement);
+        });
+
+        // 更新进度
+        updateProgress();
+
+        // 更新按钮状态
+        prevBtn.disabled = currentQuestion === 0;
+
+        if (currentQuestion === quizData.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+        }
+        // 更新按钮禁用状态（新增）
+        updateButtonState();
+    }
+
+    // 更新按钮禁用状态（新增函数）
+    function updateButtonState() {
+        // 如果当前问题未回答，则禁用下一个/提交按钮
+        const isCurrentAnswered = userAnswers[currentQuestion] !== -1;
+
+        // 如果不是最后一题
+        if (currentQuestion < quizData.length - 1) {
+            nextBtn.disabled = !isCurrentAnswered;
+        }
+        // 如果是最后一题
+        else {
+            submitBtn.disabled = !isCurrentAnswered;
+        }
+
+        // 更新上一题按钮状态（保持不变）
+        prevBtn.disabled = currentQuestion === 0;
+    }
+
+    // 选择选项
+    function selectOption(optionElement, optionIndex) {
+        const options = document.querySelectorAll('.option');
+        options.forEach(opt => opt.classList.remove('selected'));
+
+        optionElement.classList.add('selected');
+        optionElement.querySelector('input').checked = true;
+
+        if (userAnswers[currentQuestion] === -1) {
+            answeredCount++;
+            answeredCountEl.textContent = answeredCount;
+        }
+
+        userAnswers[currentQuestion] = optionIndex;
+        // 更新按钮状态（新增）
+        updateButtonState();
+    }
+
+    // 更新进度条
+    function updateProgress() {
+        const progressPercent = ((currentQuestion + 1) / quizData.length) * 100;
+        progressEl.style.width = `${progressPercent}%`;
+    }
+
+    // 下一题
+    nextBtn.addEventListener('click', () => {
+        if (currentQuestion < quizData.length - 1) {
+            currentQuestion++;
+            loadQuestion();
+        }
+    });
+
+    // 上一题
+    prevBtn.addEventListener('click', () => {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            loadQuestion();
+        }
+    });
+
+    // 提交测试
+    submitBtn.addEventListener('click', collectAnswers);
+
+    // 收集用户答案并展示
+    function collectAnswers() {
+        // 整理所有问题和用户回答
+        const userResponses = [];
+
+        for (let i = 0; i < quizData.length; i++) {
+            const quizItem = quizData[i];
+            const userAnswerIndex = userAnswers[i];
+
+            userResponses.push({
+                questionId: quizItem.id,
+                question: quizItem.question,
+                userAnswerIndex: userAnswerIndex,
+                options: quizItem.options,
+                userAnswerText: userAnswerIndex === -1
+                    ? "未作答"
+                    : quizItem.options[userAnswerIndex].text
+            });
+        }
+
+        // 渲染回答摘要
+        displayResponseSummary(userResponses);
+
+        // 显示完成页面
+        document.querySelector('.question-container').style.display = 'none';
+        document.querySelector('.button-container').style.display = 'none';
+        completionNotice.style.display = 'block';
+
+        restartBtn.disabled = true;
+        document.querySelector('.course-access-btn').disabled = true;
+
+        // 实际应用中，这里应该调用AI分析接口
+        submitUserAnswers(userResponses);
+    }
+
+    // 显示回答摘要
+    function displayResponseSummary(responses) {
+        reviewContainer.innerHTML = '';
+
+        responses.forEach((resp, index) => {
+            const reviewItem = document.createElement('div');
+            reviewItem.classList.add('review-item');
+
+            let statusIcon = "✅";
+            if (resp.userAnswerIndex === -1) statusIcon = "⚠️";
+            else if (resp.userAnswerIndex !== quizData[index].answer) statusIcon = "❌";
+
+            reviewItem.innerHTML = `
+                <div class="review-question">${statusIcon} 问题 ${index + 1}: ${resp.question}</div>
+                <div class="review-answer">您的答案: ${resp.userAnswerText}</div>
+            `;
+
+            reviewContainer.appendChild(reviewItem);
+        });
+    }
+
+    // 用于AI分析的数据
+    function submitUserAnswers(responses) {
+        // 获取CSRF token（确保在HTML模板中使用了{% csrf_token %}）
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        // 创建Fetch请求
+        fetch('/report/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'Accept': 'text/event-stream'
+            },
+            body: JSON.stringify({
+                user_answers: responses,
+                stream: true  // 明确要求流式响应
+            })
+        })
+            .then(response => {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let progressHtml = '';
+
+                function readStream() {
+                    return reader.read().then(({done, value}) => {
+                        if (done) {
+                            // 流结束时处理
+                            resultContainer.innerHTML = marked.parse(progressHtml);
+                            restartBtn.disabled = false;
+                            document.querySelector('.processing-msg').textContent = '报告已分析完毕！';
+                            document.querySelector('.course-access-btn').disabled = false;
+                            return;
+                        }
+
+                        // 处理流数据
+                        const chunk = decoder.decode(value, {stream: true});
+                        progressHtml += chunk;
+
+                        // 实时更新到页面（可选）
+                        resultContainer.innerHTML = marked.parse(progressHtml);
+
+                        // 继续读取
+                        return readStream();
+                    });
+                }
+
+                return readStream();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultContainer.innerHTML = '分析失败';
+                restartBtn.disabled = false;
+            });
+    }
+
+    // 课程访问按钮点击事件处理
+    document.getElementsByClassName('course-access-btn')[0].addEventListener('click', () => {
+        window.location.href = {% url 'enrollment' %};
+    });
+
+    // 重新开始测试按钮点击事件处理
+    restartBtn.addEventListener('click', () => {
+        // 重置当前问题索引到第一题
+        currentQuestion = 0;
+        // 重置用户答案数组，全部设为未回答状态(-1)
+        userAnswers = Array(quizData.length).fill(-1);
+        // 重置已回答问题计数器
+        answeredCount = 0;
+        // 更新页面显示的回答数量
+        answeredCountEl.textContent = answeredCount;
+
+        // 显示问题容器
+        document.querySelector('.question-container').style.display = 'block';
+        // 清空结果容器
+        resultContainer.innerHTML = '';
+        // 隐藏处理消息
+        document.querySelector('.processing-msg').innerHTML = `
+            <i class="fas fa-sync fa-spin"></i> 正在将您的回答提交给AI进行分析...
+            <span class="progress-text" id="progress-text"></span>
+        `;
+        // 显示按钮容器(使用flex布局)
+        document.querySelector('.button-container').style.display = 'flex';
+        // 隐藏完成通知区域
+        completionNotice.style.display = 'none';
+
+        // 重新加载第一个问题
+        loadQuestion();
+    });
+
+
+    // 初始化加载第一个问题
+    loadQuestion();
+</script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上海西点青少年军事夏令营报名表</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', '微软雅黑', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+            background-image: linear-gradient(120deg, #e0f7e0 0%, #f0f8ff 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(to right, #2c5e1a, #3a7d1e);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="0,0 100,0 100,100" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 100% 100%;
+            z-index: 0;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .form-title {
+            background: linear-gradient(to right, #4a7729, #5c8c3a);
+            color: white;
+            padding: 15px 25px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-title i {
+            margin-right: 12px;
+            font-size: 22px;
+        }
+
+        .form-content {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+
+        .form-col {
+            flex: 1;
+            min-width: 250px;
+            padding: 0 10px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .camp-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .camp-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        .camp-option:hover {
+            border-color: #5c8c3a;
+            background: #f0f7e9;
+        }
+
+        .camp-option.selected {
+            border-color: #5c8c3a;
+            background: #edf7e5;
+            box-shadow: 0 4px 8px rgba(92, 140, 58, 0.15);
+        }
+
+        .camp-option h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+
+        .date-input {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .date-input i {
+            margin-right: 10px;
+            color: #5c8c3a;
+        }
+
+        .declaration {
+            background: #f8f9fa;
+            border-left: 4px solid #5c8c3a;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+
+        .signature {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .signature-box {
+            flex: 1;
+            max-width: 250px;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, #2c5e1a, #3a7d1e);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(44, 94, 26, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(to right, #3a7d1e, #4a9a24);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(44, 94, 26, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .form-col {
+                min-width: 100%;
+            }
+
+            .signature {
+                flex-direction: column;
+            }
+
+            .signature-box {
+                max-width: 100%;
+                margin-bottom: 15px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>上海西点青少年军事夏令营报名表</h1>
+            <p>感谢您参加我们的活动，请认真填写以下所有信息，并确保信息的正确性，以便于我们与您联系！</p>
+        </header>
+
+        {% if messages %}
+        <div class="form-card" style="background-color: #dff0d8; border-color: #d6e9c6; color: #3c763d;">
+            {% for message in messages %}
+            <div class="form-content">
+                <p><i class="fas fa-check-circle"></i> {{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form id="campForm" method="post">
+            {% csrf_token %}
+
+            <!-- 营员信息部分 -->
+            <div class="form-card">
+                <div class="form-title">
+                    <i class="fas fa-user"></i>
+                    <span>营员信息</span>
+                </div>
+                <div class="form-content">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_name" class="required">姓名</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_gender" class="required">性别</label>
+                            {{ form.gender }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_pickup_location" class="required">接送地点</label>
+                            {{ form.pickup_location }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_birthdate" class="required">出生日期</label>
+                            {{ form.birthdate }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_hometown" class="required">籍贯</label>
+                            {{ form.hometown }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_blood_type">血型</label>
+                            {{ form.blood_type }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_id_card" class="required">身份证号</label>
+                            {{ form.id_card }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_height" class="required">身高(cm)</label>
+                            {{ form.height }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_weight" class="required">体重(kg)</label>
+                            {{ form.weight }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_email">E-mail</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_hobbies">兴趣爱好</label>
+                            {{ form.hobbies }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_specialty">个人专长</label>
+                            {{ form.specialty }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_school_class" class="required">学校及班级</label>
+                            {{ form.school_class }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 训练营选择部分 -->
+            <div class="form-card">
+                <div class="form-title">
+                    <i class="fas fa-campground"></i>
+                    <span>选择训练营</span>
+                </div>
+                <div class="form-content">
+                    <div class="camp-options">
+                        <div class="camp-option" onclick="selectCamp(this)">
+                            <h3><input type="radio" name="camp_type" value="15天训练营"> 15天训练营</h3>
+                            <div class="date-input">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ form.camp_date_15 }}
+                            </div>
+                        </div>
+
+                        <div class="camp-option" onclick="selectCamp(this)">
+                            <h3><input type="radio" name="camp_type" value="15天将帅营"> 15天将帅营</h3>
+                            <div class="date-input">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ form.camp_date_15_commander }}
+                            </div>
+                        </div>
+
+                        <div class="camp-option" onclick="selectCamp(this)">
+                            <h3><input type="radio" name="camp_type" value="30天训练营"> 30天训练营</h3>
+                            <div class="date-input">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ form.camp_date_30 }}
+                            </div>
+                        </div>
+
+                        <div class="camp-option" onclick="selectCamp(this)">
+                            <h3><input type="radio" name="camp_type" value="30天将帅营"> 30天将帅营</h3>
+                            <div class="date-input">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ form.camp_date_30_commander }}
+                            </div>
+                        </div>
+
+                        <div class="camp-option" onclick="selectCamp(this)">
+                            <h3><input type="radio" name="camp_type" value="45天训练营"> 45天训练营</h3>
+                            <div class="date-input">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ form.camp_date_45 }}
+                            </div>
+                        </div>
+
+                        <div class="camp-option" onclick="selectCamp(this)">
+                            <h3><input type="radio" name="camp_type" value="45天将帅营"> 45天将帅营</h3>
+                            <div class="date-input">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ form.camp_date_45_commander }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_special_notes">家长最希望营员解决或纠正的习惯性难点，以及其它另类问题</label>
+                        {{ form.special_notes }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 监护人信息部分 -->
+            <div class="form-card">
+                <div class="form-title">
+                    <i class="fas fa-user-friends"></i>
+                    <span>监护人信息</span>
+                </div>
+                <div class="form-content">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_guardian_name" class="required">监护人姓名</label>
+                            {{ form.guardian_name }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_guardian_workplace">工作单位</label>
+                            {{ form.guardian_workplace }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_guardian_id_card" class="required">身份证号</label>
+                            {{ form.guardian_id_card }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_guardian_phone" class="required">联系方式</label>
+                            {{ form.guardian_phone }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_relationship" class="required">与营员关系</label>
+                            {{ form.relationship }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_emergency_phone" class="required">24小时紧急联系电话</label>
+                            {{ form.emergency_phone }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_address" class="required">家庭详细住址</label>
+                            {{ form.address }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="id_postal_code" class="required">邮政编码</label>
+                            {{ form.postal_code }}
+                        </div>
+                        <div class="form-col">
+                            <label for="id_region" class="required">所属区域</label>
+                            {{ form.region }}
+                        </div>
+                    </div>
+
+                    <div class="declaration">
+                        <p>家长(监护人)声明: 本 <span id="guardianTitle">______</span> 先生/女士(身份证号码: <span id="guardianIdDisplay">__________________</span> ), 与参加者关系为 <span id="relationshipDisplay">______</span> 现同意他/她参加"上海西点青少年军事夏令营"。并声明他/她健康状况良好,并无患心脏病、高血压,无任何易突发性病史及骨伤适合并自愿参加"上海西点青少年军事夏令营",要求其遵守"上海西点青少年军事夏令营"的规则及教官之要求。</p>
+                    </div>
+
+                    <div class="signature">
+                        <div class="signature-box">
+                            <label for="id_signature" class="required">监护人签字</label>
+                            {{ form.signature }}
+                        </div>
+                        <div class="signature-box">
+                            <label for="id_sign_date" class="required">签字日期</label>
+                            {{ form.sign_date }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if form.errors %}
+            <div class="form-card" style="background-color: #f8d7da; border-color: #f5c6cb; color: #721c24;">
+                <div class="form-content">
+                    <p><i class="fas fa-exclamation-triangle"></i> 表单提交中有错误，请检查并修正以下问题：</p>
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> 提交报名表
+            </button>
+        </form>
+
+        <footer>
+            <p>上海西点青少年军事夏令营 © 2025 版权所有 | 联系电话: 021-XXXXXXX</p>
+        </footer>
+    </div>
+
+    <script>
+        // 训练营选择交互
+        function selectCamp(element) {
+            // 移除所有选项的选中样式
+            document.querySelectorAll('.camp-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // 为当前选项添加选中样式
+            element.classList.add('selected');
+
+            // 选中单选按钮
+            const radio = element.querySelector('input[type="radio"]');
+            radio.checked = true;
+        }
+
+        // 自动更新声明中的信息
+        document.getElementById('id_guardian_name').addEventListener('input', function() {
+            document.getElementById('guardianTitle').textContent = this.value;
+        });
+
+        document.getElementById('id_guardian_id_card').addEventListener('input', function() {
+            document.getElementById('guardianIdDisplay').textContent = this.value;
+        });
+
+        document.getElementById('id_relationship').addEventListener('change', function() {
+            document.getElementById('relationshipDisplay').textContent = this.value;
+        });
+
+        // 如果表单验证失败，保留之前选择的训练营样式
+        window.addEventListener('load', function() {
+            const selectedRadio = document.querySelector('input[name="camp_type"]:checked');
+            if (selectedRadio) {
+                const selectedCamp = selectedRadio.closest('.camp-option');
+                if (selectedCamp) {
+                    selectedCamp.classList.add('selected');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

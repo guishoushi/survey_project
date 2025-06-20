@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成长伙伴 - 青少年好习惯打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',    // 绿色：代表成长和积极
+                        secondary: '#FF9800',  // 橙色：代表活力和热情
+                        accent: '#2196F3',     // 蓝色：代表信任和稳定
+                        light: '#F1F8E9',      // 浅绿色：用于背景
+                        dark: '#1B5E20',       // 深绿色：用于强调
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .card-hover {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+
+            .btn-gradient {
+                background-image: linear-gradient(to right, #4CAF50, #81C784);
+                transition: background-position 0.3s ease, transform 0.2s ease;
+                background-size: 200% auto;
+            }
+
+            .btn-gradient:hover {
+                background-position: right center;
+                transform: translateY(-2px);
+            }
+
+            .btn-gradient:active {
+                transform: translateY(0);
+            }
+
+            .input-focus {
+                transition: all 0.3s ease;
+            }
+
+            .input-focus:focus-within {
+                transform: translateY(-2px);
+            }
+
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .animate-pulse-slow {
+                animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+
+            .animate-gradient {
+                animation: gradient 15s ease infinite;
+            }
+
+            @keyframes float {
+                0% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-15px);
+                }
+                100% {
+                    transform: translateY(0px);
+                }
+            }
+            @keyframes gradient {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-inter overflow-x-hidden bg-light">
+<!-- 动态背景容器 -->
+<div id="background" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+<div class="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
+    <!-- 顶部导航 -->
+    <header class="flex justify-between items-center mb-16 pt-4">
+        <div class="flex items-center space-x-2">
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                <i class="fa fa-leaf text-white text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-dark">上海西点好习惯夏令营</h1>
+        </div>
+        <nav class="hidden md:flex items-center space-x-8">
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">首页</a>
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">关于我们</a>
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">帮助中心</a>
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">联系我们</a>
+        </nav>
+        <button class="md:hidden text-gray-600 hover:text-primary transition-colors">
+            <i class="fa fa-bars text-xl"></i>
+        </button>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex flex-col md:flex-row items-center justify-between gap-12">
+        <!-- 左侧介绍 -->
+        <div class="w-full md:w-1/2 text-center md:text-left">
+            <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark leading-tight mb-6 animate-fade-in">
+                培养好习惯，<br>
+                <span class="text-primary">见证更好的自己</span>
+            </h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-lg mx-auto md:mx-0">
+                每天坚持一点点，记录你的成长轨迹，让我们一起成为更优秀的青少年！
+            </p>
+
+            <!-- 特色亮点 -->
+            <div class="space-y-6 mb-8">
+                <div class="flex items-start space-x-4 group">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:bg-primary/20">
+                        <i class="fa fa-check text-primary text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">简单易用的打卡系统</h3>
+                        <p class="text-gray-600 text-base mt-1">轻松记录每天的好习惯，一目了然查看进步</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-4 group">
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:bg-secondary/20">
+                        <i class="fa fa-star text-secondary text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">有趣的奖励机制</h3>
+                        <p class="text-gray-600 text-base mt-1">持续坚持获得成就徽章，激励你不断前进</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-4 group">
+                    <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:bg-accent/20">
+                        <i class="fa fa-users text-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">与朋友一起成长</h3>
+                        <p class="text-gray-600 text-base mt-1">邀请好友互相监督，共同进步</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计数据 -->
+            <div class="flex justify-center md:justify-start space-x-8 mb-8">
+                <div class="text-center p-4 rounded-xl bg-white/70 backdrop-blur-sm shadow-md card-hover">
+                    <p class="text-3xl font-bold text-primary">50万+</p>
+                    <p class="text-gray-500 text-sm mt-1">青少年用户</p>
+                </div>
+                <div class="text-center p-4 rounded-xl bg-white/70 backdrop-blur-sm shadow-md card-hover">
+                    <p class="text-3xl font-bold text-primary">200+</p>
+                    <p class="text-gray-500 text-sm mt-1">好习惯类别</p>
+                </div>
+                <div class="text-center p-4 rounded-xl bg-white/70 backdrop-blur-sm shadow-md card-hover">
+                    <p class="text-3xl font-bold text-primary">1000万+</p>
+                    <p class="text-gray-500 text-sm mt-1">累计打卡</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧登录表单 -->
+        <div class="w-full md:w-5/12">
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 card-hover border border-white/50">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                        <i class="fa fa-mobile-phone text-4xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">欢迎回来</h3>
+                    <p class="text-gray-500">登录你的成长账户，继续你的成长之旅</p>
+                </div>
+
+                <form id="loginForm" class="space-y-6" method="post">
+                    {% csrf_token %}
+
+                    <!-- 手机号字段 - 手动添加属性但保留表单值 -->
+                    <div class="input-focus">
+                        <label for="id_username" class="block text-sm font-medium text-gray-700 mb-2">手机号</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa fa-mobile-phone text-gray-400 text-xl"></i>
+                            </div>
+                            <input
+                                    type="tel"
+                                    id="id_username"
+                                    name="username"
+                                    class="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-gray-400"
+                                    placeholder="请输入你的手机号"
+                                    required
+                                    pattern="^1[3-9]\d{9}$"
+                                    title="请输入有效的11位手机号"
+                                    value="{{ form.username.value|default_if_none:'' }}">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center text-green-500 opacity-0"
+                                 id="phoneValid">
+                                <i class="fa fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 密码字段 - 保留所有原始样式 -->
+                    <div class="input-focus">
+                        <label for="id_password" class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa fa-lock text-gray-400"></i>
+                            </div>
+                            <input
+                                    type="password"
+                                    id="id_password"
+                                    name="password"
+                                    class="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-gray-400"
+                                    placeholder="请输入你的密码"
+                                    required>
+                            <button type="button" id="togglePassword"
+                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
+                                <i class="fa fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        {% if form.errors %}
+                            <p class="text-red-500 text-xs mt-1" id="passwordError" style="color: red">
+                                {{ form.non_field_errors.0 }}</p>
+                        {% else %}
+                            <p class="text-red-500 text-xs mt-1 hidden" id="passwordError"></p>
+                        {% endif %}
+                    </div>
+
+                    <!-- 记住我和忘记密码 - 保持不变 -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember" name="remember" type="checkbox"
+                                   class="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded">
+                            <label for="remember" class="ml-2 block text-sm text-gray-700">记住我</label>
+                        </div>
+                        <a href="#"
+                           class="text-sm font-medium text-primary hover:text-dark transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">忘记密码?</a>
+                    </div>
+
+                    <!-- 提交按钮 - 保持不变 -->
+                    <button type="submit"
+                            class="w-full py-4 px-4 bg-primary text-white rounded-xl font-medium btn-gradient shadow-xl shadow-primary/20 flex items-center justify-center space-x-2">
+                        <span>登录</span>
+                        <i class="fa fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <p class="mt-8 text-center text-sm text-gray-600">
+                    还没有账号? <a href="#"
+                                   class="font-medium text-primary hover:text-dark transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">立即注册</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="mt-16 py-8 border-t border-gray-100/50">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <p class="text-gray-500 text-sm">&copy; 2025 成长伙伴. 保留所有权利.</p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#"
+                   class="text-gray-500 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#"
+                   class="text-gray-500 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#"
+                   class="text-gray-500 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
+                    <i class="fa fa-qq"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- 成功提示模态框 -->
+<div id="successModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+    <div class="relative bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all scale-95 opacity-0"
+         id="modalContent">
+        <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-6 animate-pulse">
+                <i class="fa fa-check text-3xl text-green-500"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">登录成功！</h3>
+            <p class="text-gray-600 text-lg mb-8">欢迎回来，我们将带你进入成长伙伴...</p>
+            <button id="closeModal"
+                    class="inline-flex justify-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-primary text-lg font-medium text-white hover:bg-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all btn-gradient w-full">
+                进入
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 密码显示/隐藏切换
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+
+        // 切换图标
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    // 手机号验证
+    const phoneInput = document.getElementById('phone');
+    const phoneValid = document.getElementById('phoneValid');
+    const phoneError = document.getElementById('phoneError');
+
+    // 登录表单提交处理
+    const loginForm = document.getElementById('loginForm');
+    const successModal = document.getElementById('successModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalContent = document.getElementById('modalContent');
+
+    loginForm.addEventListener('submit', function (e) {
+        {#e.preventDefault();#}
+
+        // 验证手机号
+        const phonePattern = /^1[3-9]\d{9}$/;
+        if (!phonePattern.test(phoneInput.value)) {
+            phoneError.classList.remove('hidden');
+            return;
+        }
+
+        // 显示成功提示
+        successModal.classList.remove('hidden');
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    });
+
+    closeModal.addEventListener('click', function () {
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            successModal.classList.add('hidden');
+        }, 300);
+    });
+
+    // 点击模态框背景关闭
+    successModal.addEventListener('click', function (e) {
+        if (e.target === successModal) {
+            closeModal.click();
+        }
+    });
+
+    // 添加页面载入动画
+    document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('opacity-100');
+        document.body.classList.remove('opacity-0');
+
+        // 初始化动态背景
+        initBackground();
+    });
+
+    // 动态粒子背景
+    function initBackground() {
+        const bg = document.getElementById('background');
+        createParticleBackground(bg);
+    }
+
+    // 动态粒子背景
+    function createParticleBackground(container) {
+        // 创建一个画布元素
+        const canvas = document.createElement('canvas');
+        container.appendChild(canvas);
+
+        // 设置画布尺寸
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const particleCount = 168;
+        const colors = ['#4CAF50', '#FF9800', '#2196F3','#F44336','#9C27B0','#FFEB3B','#E91E63'];
+
+        // 创建粒子
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 3 + 1,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speedX: (Math.random() - 0.5) * 0.5,
+                speedY: (Math.random() - 0.5) * 0.5,
+                opacity: Math.random() * 0.5 + 0.2
+            });
+        }
+
+        // 绘制粒子
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, 'rgba(241, 248, 233, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制粒子
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `${particle.color}${Math.floor(particle.opacity * 255).toString(16)}`;
+                ctx.fill();
+
+                // 更新粒子位置
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+
+                // 边界检测
+                if (particle.x < 0 || particle.x > canvas.width) {
+                    particle.speedX = -particle.speedX;
+                }
+                if (particle.y < 0 || particle.y > canvas.height) {
+                    particle.speedY = -particle.speedY;
+                }
+            });
+
+            // 绘制粒子间的连线
+            particles.forEach(particle => {
+                particles.forEach(otherParticle => {
+                    const dx = particle.x - otherParticle.x;
+                    const dy = particle.y - otherParticle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(particle.x, particle.y);
+                        ctx.lineTo(otherParticle.x, otherParticle.y);
+                        ctx.strokeStyle = `${particle.color}${Math.floor((1 - distance / 100) * particle.opacity * 128).toString(16)}`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    }
+</script>
+</body>
+</html>    
