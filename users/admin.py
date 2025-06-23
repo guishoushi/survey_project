@@ -11,7 +11,6 @@ class CustomUserAdmin(UserAdmin):
         ('个人信息', {'fields': ('username', 'first_name', 'last_name', 'email', 'avatar', 'bio')}),
         ('权限', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('重要日期', {'fields': ('last_login', 'date_joined')}),
-        ('统计信息', {'fields': ('habit_streak', 'total_checkins')}),
         ('成就徽章', {'fields': ('badges',)}),
     )
     add_fieldsets = (
@@ -20,7 +19,7 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('phone', 'username', 'password1', 'password2'),
         }),
     )
-    list_display = ('phone', 'username', 'is_staff', 'habit_streak', 'total_checkins')
+    list_display = ('phone', 'username', 'is_staff')
     search_fields = ('phone', 'username', 'email')
     ordering = ('-date_joined',)
 
@@ -35,7 +34,7 @@ class CheckInAdmin(admin.ModelAdmin):
 
 @register(BadgeRecords)
 class BadgeRecordsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'badge','unlocked', 'unlocked_at')
+    list_display = ('user', 'badge', 'unlocked', 'unlocked_at')
     list_filter = ('user', 'badge', 'unlocked_at')
     list_editable = ('unlocked',)
     search_fields = ('user__username', 'badge__name')
@@ -43,7 +42,8 @@ class BadgeRecordsAdmin(admin.ModelAdmin):
 
 @register(Badge)
 class BadgeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'icon', 'description')
+    list_display = ('name', 'icon','habit', 'description')
+    list_editable = ('habit',)
     search_fields = ('name', 'description')
 
 

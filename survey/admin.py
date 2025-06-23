@@ -144,6 +144,6 @@ class CampEnrollmentAdmin(ImportExportModelAdmin):
     export_as_csv.short_description = "导出选中项为 CSV"
 
 
-admin.site.site_header = '上海西点夏令营管理后台'
+admin.site.site_header = '西点好习惯夏令营管理后台'
 admin.site.site_title = '夏令营报名系统'
 admin.site.index_title = '系统管理'

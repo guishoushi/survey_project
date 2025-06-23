@@ -1,4 +1,5 @@
 import json
+from distutils.command.check import check
 
 from django.core.files.locks import unlock
 from django.http import JsonResponse
@@ -165,7 +166,7 @@ class UserDashboardView(LoginRequiredMixin, View):
                 'icon': badge.icon.url,  # 图标
                 'description': badge.description,  # 描述
                 'required_days': badge.required_days,  # 所需天数解锁
-                'unlocked': unlocked, # 有可能会出现为None的现象
+                'unlocked': unlocked,  # 是否解锁
             })
         context = {
             'habits': user_habit_data,
@@ -177,12 +178,13 @@ class UserDashboardView(LoginRequiredMixin, View):
 
     def check_and_award_badges(self, user):
         """检查并授予用户徽章"""
+        checkin = CheckIn.objects.filter(user=user)
         badges = Badge.objects.all()
-        for badge in badges:
-            if user.habit_streak >= badge.required_days and badge not in user.badges.all():
-                user.badges.add(badge)
-                user.save()
-                messages.success(user, f"恭喜！你获得了徽章：{badge.name}")
+        for check in checkin:  # 遍历每个用户的打卡记录
+            for badge in badges.filter(habit=check.habit):
+                if check.streak >= badge.required_days and not BadgeRecords.objects.filter(badge=badge,
+                                                                                           user=user).first():
+                    BadgeRecords.objects.create(badge=badge, user=user, unlocked=True)
 
 
 class CheckInCreateView(LoginRequiredMixin, View):

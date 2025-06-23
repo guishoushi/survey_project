@@ -10,8 +10,6 @@ class UserProfile(AbstractUser):
                              error_messages={'unique': _("该手机号已被注册。")})
     avatar = models.ImageField(_("头像"), upload_to='avatars/', blank=True, default='avatars/default.png')
     bio = models.TextField(_("个人简介"), blank=True, max_length=500)
-    habit_streak = models.IntegerField(_("连续打卡天数"), default=0)
-    total_checkins = models.IntegerField(_("总打卡次数"), default=0)
     badges = models.ManyToManyField('Badge', verbose_name=_("成就徽章"), blank=True)
 
     USERNAME_FIELD = 'phone'
@@ -23,37 +21,6 @@ class UserProfile(AbstractUser):
     class Meta:
         verbose_name = _("用户")
         verbose_name_plural = _("用户")
-
-
-class Badge(models.Model):
-    """成就徽章模型"""
-    name = models.CharField(_("徽章名称"), max_length=50)
-    description = models.CharField(_("徽章描述"), max_length=200)
-    icon = models.ImageField(_("徽章图标"), upload_to='badges/', blank=True, default='badges/default.png')
-    required_days = models.IntegerField(_("所需连续打卡天数"), default=7)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = _("成就徽章")
-        verbose_name_plural = _("成就徽章")
-
-
-class BadgeRecords(models.Model):
-    """用户获得的徽章记录模型"""
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="badge_records")
-    badge = models.ForeignKey(Badge, on_delete=models.CASCADE, related_name="badge_records")
-    unlocked = models.BooleanField(_("是否解锁"), default=False)
-    unlocked_at = models.DateTimeField(_("解锁时间"), auto_now_add=True)
-
-    class Meta:
-        verbose_name = _("徽章记录")
-        verbose_name_plural = _("徽章记录")
-        unique_together = ('user', 'badge')
-
-    def __str__(self):
-        return f"{self.user.username} 的 {self.badge.name} 徽章"
 
 
 class Habit(models.Model):
@@ -92,8 +59,8 @@ class Habit(models.Model):
 
 class CheckIn(models.Model):
     """打卡记录模型"""
-    habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name="checkins")
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="checkins")
+    habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name="checkins", verbose_name=_("习惯"))
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="checkins", verbose_name=_("用户"))
     streak = models.IntegerField(_("当前连续打卡"), default=0)
     total_checkins = models.IntegerField(_("总打卡次数"), default=0)
     date = models.DateField(_("打卡日期"), auto_now=True)
@@ -107,3 +74,37 @@ class CheckIn(models.Model):
         verbose_name = _("习惯记录")
         verbose_name_plural = _("习惯记录")
         unique_together = ('habit', 'user', 'date')
+
+
+class Badge(models.Model):
+    """成就徽章模型"""
+    name = models.CharField(_("徽章名称"), max_length=50)
+    description = models.CharField(_("徽章描述"), max_length=200)
+    icon = models.ImageField(_("徽章图标"), upload_to='badges/', blank=True, default='badges/default.png')
+    required_days = models.IntegerField(_("所需连续打卡天数"), default=7)
+    # 关联习惯
+    habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name="badges", verbose_name=_("习惯"))
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _("成就徽章")
+        verbose_name_plural = _("成就徽章")
+
+
+class BadgeRecords(models.Model):
+    """用户获得的徽章记录模型"""
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="badge_records",
+                             verbose_name=_("用户"))
+    badge = models.ForeignKey(Badge, on_delete=models.CASCADE, related_name="badge_records", verbose_name=_("徽章"))
+    unlocked = models.BooleanField(_("是否解锁"), default=False)
+    unlocked_at = models.DateTimeField(_("解锁时间"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("徽章记录")
+        verbose_name_plural = _("徽章记录")
+        unique_together = ('user', 'badge')
+
+    def __str__(self):
+        return f"{self.user.username} 的 {self.badge.name} 徽章"

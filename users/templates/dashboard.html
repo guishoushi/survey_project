@@ -689,26 +689,14 @@
                         </div>
                     {% else %}
                         <div class="achievement-card ">
-                            <img src="{{ badge.icon }}" style="width: 100%;border-radius: 10%;filter: grayscale(100%);">
+                            <img src="{{ badge.icon }}"
+                                 style="width: 100%;border-radius: 10%;filter: grayscale(100%); ">
                             <div class="achievement-name">{{ badge.name }}</div>
                             <div class="achievement-status"> 连续打卡{{ badge.required_days }}天</div>
                             <div class="achievement-status">未解锁</div>
                         </div>
                     {% endif %}
-
-
-
                 {% endfor %}
-
-
-                <div class="achievement-card ">
-                    <div class="achievement-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <div class="achievement-name">习惯启动者</div>
-                    <div class="achievement-status">已解锁</div>
-                </div>
-
             </div>
         </section>
     </div>
