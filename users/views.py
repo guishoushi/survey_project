@@ -166,12 +166,90 @@ class UserDashboardView(LoginRequiredMixin, View):
                 'icon': badge.icon.url,  # 图标
                 'description': badge.description,  # 描述
                 'required_days': badge.required_days,  # 所需天数解锁
-                'unlocked': unlocked,  # 是否解锁
+                'unlocked': unlocked,  # 是否解锁,
+                'habit_name': badge.habit.name,  # 勋章对应的习惯名称
             })
+        # 渲染报告信息
+        # 获取用户总打卡次数
+        total_punches = CheckIn.objects.filter(user=request.user).values_list('total_checkins', flat=True)
+        # 获取用户解锁徽章的总数
+        total_badges = BadgeRecords.objects.filter(user=request.user).count()
+        # 计算用户打卡进度的完成率
+        finish_ratio = 0
+        record_list = CheckIn.objects.filter(user=request.user)
+        if record_list:
+
+            for checkin in record_list:
+                finish_ratio += checkin.streak / checkin.habit.goal * 100
+            finish_ratio = round(finish_ratio / len(record_list), 2)
+        else:
+            record_list = [1,]
+
+        # 计算用户的等级
+        if finish_ratio >= 95:
+            level = 'A+ 卓越'
+        elif finish_ratio >= 85:
+            level = 'A 优秀'
+        elif finish_ratio >= 75:
+            level = 'B 达标'
+        elif finish_ratio >= 65:
+            level = 'C 发展中'
+        else:
+            level = 'D 未达标'
+
+        # 渲染用户排行榜
+        user_ranking = UserProfile.objects.all()[:3]
+        user_list = []
+        for user in user_ranking:
+            # user.checkins.all().values_list('streak')
+            if user.checkins.all().values_list('streak', flat=True):
+                user_list.append({
+                    'username': user.username,
+                    'streak': max(user.checkins.all().values_list('streak', flat=True)),
+                    'total_number': sum(user.checkins.all().values_list('total_checkins', flat=True)),
+                    'unlocked_badge_count': BadgeRecords.objects.filter(user=user).count(),
+                    'completion_rate': round(
+                        sum(user.checkins.all().values_list('streak', flat=True)) / len(user.checkins.all()), 2),
+                    'level': 'D 未达标' if sum(user.checkins.all().values_list('streak', flat=True)) / len(
+                        user.checkins.all()) < 0.5 else 'C 发展中' if sum(
+                        user.checkins.all().values_list('streak', flat=True)) / len(
+                        user.checkins.all()) < 0.75 else 'B 达标' if sum(
+                        user.checkins.all().values_list('streak', flat=True)) / len(
+                        user.checkins.all()) < 0.85 else 'A 优秀' if sum(
+                        user.checkins.all().values_list('streak', flat=True)) / len(
+                        user.checkins.all()) < 0.95 else 'A+ 卓越'
+                })
+            else:
+                user_list.append({
+                    'username': user.username,
+                    'streak': 0,
+                    'total_number': 0,
+                    'unlocked_badge_count': 0,
+                    'completion_rate': 0,
+                    'level': 'D 未达标'
+                })
+        print(user_list)
+
+        def sort_users(users):
+            return sorted(users, key=lambda x: (
+                -x['completion_rate'],  # 完成率降序（高的在前）
+                -x['streak'],  # 连续打卡天数降序
+                -x['unlocked_badge_count'],  # 解锁徽章数量降序
+                -x['total_number'],  # 总任务数量降序
+                x['username']  # 用户名升序
+            ))
+
+        # 排序并打印结果
+        sorted_users = sort_users(user_list)
         context = {
             'habits': user_habit_data,
             'today_checkins': today_checkins,
             'badges': badges_list,
+            'total_punches': sum(total_punches),
+            'total_badges': total_badges,
+            'finish_ratio': round(finish_ratio / len(record_list), 2),
+            'level': level,
+            'user_ranking': sorted_users
         }
 
         return render(request, self.template_name, context=context)

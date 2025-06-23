@@ -550,6 +550,93 @@
                 justify-content: center;
             }
         }
+
+
+        .top-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .top-users {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .top-users h2 {
+            text-align: center;
+            color: #2575fc;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .top-user {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 12px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .top-user:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-first {
+            background: linear-gradient(135deg, #FFD700 0%, #FFEC8B 100%);
+        }
+
+        .user-second {
+            background: linear-gradient(135deg, #C0C0C0 0%, #F0F0F0 100%);
+        }
+
+        .user-third {
+            background: linear-gradient(135deg, #CD7F32 0%, #EDC391 100%);
+        }
+
+        .medal {
+            font-size: 40px;
+            margin-right: 15px;
+        }
+
+        .user-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .user-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .user-days {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .redeem-btn {
+            background: #FF5722;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s;
+        }
+
+        .redeem-btn:hover {
+            background: #E64A19;
+        }
     </style>
 </head>
 <body>
@@ -684,7 +771,9 @@
                         <div class="achievement-card unlocked">
                             <img src="{{ badge.icon }}" style="width: 100%;border-radius: 10%">
                             <div class="achievement-name">{{ badge.name }}</div>
-                            <div class="achievement-status"> 连续打卡{{ badge.required_days }}天</div>
+                            <div class="achievement-status">
+                                《{{ badge.habit_name }}》连续打卡{{ badge.required_days }}天
+                            </div>
                             <div class="achievement-status">已解锁</div>
                         </div>
                     {% else %}
@@ -692,7 +781,9 @@
                             <img src="{{ badge.icon }}"
                                  style="width: 100%;border-radius: 10%;filter: grayscale(100%); ">
                             <div class="achievement-name">{{ badge.name }}</div>
-                            <div class="achievement-status"> 连续打卡{{ badge.required_days }}天</div>
+                            <div class="achievement-status">
+                                《{{ badge.habit_name }}》连续打卡{{ badge.required_days }}天
+                            </div>
                             <div class="achievement-status">未解锁</div>
                         </div>
                     {% endif %}
@@ -704,23 +795,76 @@
     <!-- 统计摘要 -->
     <div class="stats-summary">
         <div class="summary-item">
-            <div class="summary-number">86%</div>
+            <div class="summary-number">{{ finish_ratio }}%</div>
             <div class="summary-label">完成率</div>
         </div>
         <div class="summary-item">
-            <div class="summary-number">24</div>
-            <div class="summary-label">连续打卡</div>
+            <div class="summary-number">{{ total_punches }}</div>
+            <div class="summary-label">总打卡次数</div>
         </div>
         <div class="summary-item">
-            <div class="summary-number">5</div>
-            <div class="summary-label">解锁成就</div>
+            <div class="summary-number">{{ total_badges }}</div>
+            <div class="summary-label">解锁徽章</div>
         </div>
         <div class="summary-item">
-            <div class="summary-number">A+</div>
+            <div class="summary-number">{{ level }}</div>
             <div class="summary-label">成长评级</div>
         </div>
     </div>
 
+    <div class="top-section">
+        <div class="top-users">
+            <h2>前三名用户</h2>
+
+            <div class="top-user user-first">
+                <div class="medal">🥇</div>
+                <div class="user-info">
+                    <h3>{{ user_ranking.0.username }}</h3>
+                    <div class="user-days">连续打卡: {{ user_ranking.0.streak }}天</div>
+                    <div class="user-days">总打卡: {{ user_ranking.0.total_number }}次</div>
+                </div>
+                <div class="user-info">
+                    <h3>解锁徽章: {{ user_ranking.0.unlocked_badge_count }}个</h3>
+                    <div class="user-days">完成率: {{ user_ranking.0.completion_rate }}%</div>
+                    <div class="user-days">等级：{{ user_ranking.0.level }}</div>
+                </div>
+                <button class="redeem-btn">兑换奖品</button>
+            </div>
+
+
+            <div class="top-user user-second">
+                <div class="medal">🥈</div>
+                <div class="user-info">
+                    <h3>{{ user_ranking.1.username }}</h3>
+                    <div class="user-days">连续打卡: {{ user_ranking.1.streak }}天</div>
+                    <div class="user-days">总打卡: {{ user_ranking.1.total_number }}次</div>
+                </div>
+                <div class="user-info">
+                    <h3>解锁徽章: {{ user_ranking.1.unlocked_badge_count }}个</h3>
+                    <div class="user-days">完成率: {{ user_ranking.1.completion_rate }}%</div>
+                    <div class="user-days">等级：{{ user_ranking.1.level }}</div>
+                </div>
+                <button class="redeem-btn">兑换奖品</button>
+            </div>
+
+            <div class="top-user user-third">
+                <div class="medal">🥉</div>
+               <div class="user-info">
+                    <h3>{{ user_ranking.2.username }}</h3>
+                    <div class="user-days">连续打卡: {{ user_ranking.2.streak }}天</div>
+                    <div class="user-days">总打卡: {{ user_ranking.2.total_number }}次</div>
+                </div>
+                <div class="user-info">
+                    <h3>解锁徽章: {{ user_ranking.2.unlocked_badge_count }}个</h3>
+                    <div class="user-days">完成率: {{ user_ranking.2.completion_rate }}%</div>
+                    <div class="user-days">等级：{{ user_ranking.2.level }}</div>
+                </div>
+                <button class="redeem-btn">兑换奖品</button>
+            </div>
+        </div>
+
+
+    </div>
     <!-- 操作按钮 -->
     <div class="action-buttons">
         <button class="action-btn report" id="generate-report">
@@ -730,195 +874,193 @@
             <i class="fas fa-trophy"></i> 排行榜
         </button>
     </div>
-</div>
+    <div class="confetti" id="confetti"></div>
+    {{ habits|json_script:"habits-data" }}
+    <script>
+        const habits = JSON.parse(document.getElementById('habits-data').textContent);
+        console.log(habits);
 
-<div class="confetti" id="confetti"></div>
-{{ habits|json_script:"habits-data" }}
-<script>
-    const habits = JSON.parse(document.getElementById('habits-data').textContent);
-    console.log(habits);
-
-    // 成就数据
-    const achievements = [
-        {
-            id: 1,
-            name: "习惯启动者",
-            icon: "rocket",
-            unlocked: true
-        },
-        {
-            id: 2,
-            name: "坚持小达人",
-            icon: "calendar",
-            unlocked: true
-        }
-    ];
-
-    // 初始化页面
-    document.addEventListener('DOMContentLoaded', function () {
-
-        setupEventListeners();
-
-        // 用户下拉菜单的切换
-        const userSection = document.getElementById('user-section');
-        const userDropdown = document.getElementById('user-dropdown');
-
-        userSection.addEventListener('click', function (e) {
-            // 防止点击子元素时冒泡
-            if (!e.target.closest('.user-dropdown')) {
-                userDropdown.classList.toggle('show');
-            }
-        });
-
-        // 点击文档其他区域关闭菜单
-        document.addEventListener('click', function (e) {
-            if (!userSection.contains(e.target)) {
-                userDropdown.classList.remove('show');
-            }
-        });
-    });
-
-
-    // 事件监听器
-    function setupEventListeners() {
-        // 打卡按钮事件
-        document.getElementById('habits-container').addEventListener('click', function (e) {
-            if (e.target.classList.contains('checkin-btn') && !e.target.classList.contains('checked')) {
-                const habitId = parseInt(e.target.dataset.id);
-                checkinHabit(habitId, e.target);
-            }
-        });
-
-        // 生成报告按钮
-        document.getElementById('generate-report').addEventListener('click', function () {
-            alert('正在生成本月成长报告...\n请耐心等待片刻！\n\n已完成习惯打卡总数: 27次\n成就勋章解锁: 5项\n总体完成率: 89%');
-        });
-
-        // 排行榜按钮
-        document.getElementById('generate-toplist').addEventListener('click', function () {
-            alert('正在加载排行榜...\n\n🏆 第一名：小明 (98分)\n🥈 第二名：小红 (95分)\n🥉 第三名：小刚 (92分)\n\n你是本月第2名！继续加油！');
-        });
-    }
-
-    // 打卡功能
-    function checkinHabit(habitId, button) {
-        const matchingHabits = habits.filter(h => h.id === habitId);
-        const habit = matchingHabits[0]; // 取第一个匹配项
-        console.log(habit);
-        fetch('{% url 'checkin_create' %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': 'zv4x04rqllutyutxw1kcbwa3l6gsckip' // 认证头示例
+        // 成就数据
+        const achievements = [
+            {
+                id: 1,
+                name: "习惯启动者",
+                icon: "rocket",
+                unlocked: true
             },
-            body: JSON.stringify({'habit_id': habitId})
-        })
-            .then(response => {
-                console.log('请求成功', response);
-            })
-            .then(data => {
-                console.log('请求失败', data);
-            });
-
-        if (!habit.todayDone) {
-            // 更新数据
-            habit.todayDone = true;
-            habit.streak++;
-
-            // 更新按钮状态
-            button.innerHTML = '<i class="fas fa-check-circle"></i> 今日已打卡！';
-            button.classList.add('checked');
-
-            // 显示庆祝特效
-            createConfetti();
-
-            // 检查成就解锁
-            checkAchievements();
-
-            // 更新进度条
-            const parentCard = button.closest('.habit-card');
-            const progressBar = parentCard.querySelector('.progress-bar');
-            const progressPercent = Math.min(100, (habit.streak / habit.goal) * 100);
-            const progressText = parentCard.querySelector('.progress-text span:last-child');
-            const streakText = parentCard.querySelector('.streak-counter');
-            const checkin = parentCard.querySelector('.checkin');
-
-            // 动画效果更新
-            progressBar.style.transition = 'width 1s ease-in-out';
-            progressBar.style.width = `${progressPercent}%`;
-
-            streakText.textContent = `连续打卡：${habit.streak}天`;
-            checkin.textContent = `总打卡：${habit.total_checkins + 1} 天`;
-
-            // 延迟更新百分比文字（与进度条动画同步）
-            setTimeout(() => {
-                progressText.textContent = `${Math.floor(progressPercent)}%`;
-            }, 500);
-        }
-    }
-
-    // 检查成就解锁
-    function checkAchievements() {
-        // 这里应该有更复杂的解锁逻辑
-        // 现在只是简单解锁前两个未解锁的成就
-        let unlockedNew = false;
-
-        achievements.forEach(achievement => {
-            if (!achievement.unlocked && (achievement.id === 3 || achievement.id === 5)) {
-                achievement.unlocked = true;
-                unlockedNew = true;
+            {
+                id: 2,
+                name: "坚持小达人",
+                icon: "calendar",
+                unlocked: true
             }
-        });
+        ];
 
-        if (unlockedNew) {
-            setTimeout(() => {
-                renderAchievements();
-                createConfetti();
-                setTimeout(() => {
-                    alert('恭喜！你获得了新的成就勋章！');
-                }, 500);
-            }, 1000);
-        }
-    }
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function () {
 
-    // 创建庆祝效果
-    function createConfetti() {
-        const confettiContainer = document.getElementById('confetti');
-        confettiContainer.innerHTML = '';
+            setupEventListeners();
 
-        const colors = ['#3f51b5', '#7986cb', '#ff4081', '#ff9800', '#4caf50', '#ffc107'];
+            // 用户下拉菜单的切换
+            const userSection = document.getElementById('user-section');
+            const userDropdown = document.getElementById('user-dropdown');
 
-        for (let i = 0; i < 200; i++) {
-            const confetti = document.createElement('div');
-            confetti.style.position = 'absolute';
-            confetti.style.width = '12px';
-            confetti.style.height = '12px';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-            confetti.style.left = `${Math.random() * 100}%`;
-            confetti.style.top = '-30px';
-            confetti.style.opacity = '0.9';
-            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-            confettiContainer.appendChild(confetti);
-
-            const animation = confetti.animate([{
-                transform: 'translateY(0) rotate(0deg)',
-                opacity: 0.9
-            },
-                {
-                    transform: `translateY(${window.innerHeight + 50}px) rotate(${Math.random() * 720}deg)`,
-                    opacity: 0
+            userSection.addEventListener('click', function (e) {
+                // 防止点击子元素时冒泡
+                if (!e.target.closest('.user-dropdown')) {
+                    userDropdown.classList.toggle('show');
                 }
-            ], {
-                duration: 2000 + Math.random() * 3000,
-                easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)',
-                delay: Math.random() * 300
             });
 
-            animation.onfinish = () => confetti.remove();
+            // 点击文档其他区域关闭菜单
+            document.addEventListener('click', function (e) {
+                if (!userSection.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+        });
+
+
+        // 事件监听器
+        function setupEventListeners() {
+            // 打卡按钮事件
+            document.getElementById('habits-container').addEventListener('click', function (e) {
+                if (e.target.classList.contains('checkin-btn') && !e.target.classList.contains('checked')) {
+                    const habitId = parseInt(e.target.dataset.id);
+                    checkinHabit(habitId, e.target);
+                }
+            });
+
+            // 生成报告按钮
+            document.getElementById('generate-report').addEventListener('click', function () {
+                alert('正在生成本月成长报告...\n请耐心等待片刻！\n\n已完成习惯打卡总数: 27次\n成就勋章解锁: 5项\n总体完成率: 89%');
+            });
+
+            // 排行榜按钮
+            document.getElementById('generate-toplist').addEventListener('click', function () {
+                alert('正在加载排行榜...\n\n🏆 第一名：小明 (98分)\n🥈 第二名：小红 (95分)\n🥉 第三名：小刚 (92分)\n\n你是本月第2名！继续加油！');
+            });
         }
-    }
-</script>
+
+        // 打卡功能
+        function checkinHabit(habitId, button) {
+            const matchingHabits = habits.filter(h => h.id === habitId);
+            const habit = matchingHabits[0]; // 取第一个匹配项
+            console.log(habit);
+            fetch('{% url 'checkin_create' %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': 'zv4x04rqllutyutxw1kcbwa3l6gsckip' // 认证头示例
+                },
+                body: JSON.stringify({'habit_id': habitId})
+            })
+                .then(response => {
+                    console.log('请求成功', response);
+                })
+                .then(data => {
+                    console.log('请求失败', data);
+                });
+
+            if (!habit.todayDone) {
+                // 更新数据
+                habit.todayDone = true;
+                habit.streak++;
+
+                // 更新按钮状态
+                button.innerHTML = '<i class="fas fa-check-circle"></i> 今日已打卡！';
+                button.classList.add('checked');
+
+                // 显示庆祝特效
+                createConfetti();
+
+                // 检查成就解锁
+                checkAchievements();
+
+                // 更新进度条
+                const parentCard = button.closest('.habit-card');
+                const progressBar = parentCard.querySelector('.progress-bar');
+                const progressPercent = Math.min(100, (habit.streak / habit.goal) * 100);
+                const progressText = parentCard.querySelector('.progress-text span:last-child');
+                const streakText = parentCard.querySelector('.streak-counter');
+                const checkin = parentCard.querySelector('.checkin');
+
+                // 动画效果更新
+                progressBar.style.transition = 'width 1s ease-in-out';
+                progressBar.style.width = `${progressPercent}%`;
+
+                streakText.textContent = `连续打卡：${habit.streak}天`;
+                checkin.textContent = `总打卡：${habit.total_checkins + 1} 天`;
+
+                // 延迟更新百分比文字（与进度条动画同步）
+                setTimeout(() => {
+                    progressText.textContent = `${Math.floor(progressPercent)}%`;
+                }, 500);
+            }
+        }
+
+        // 检查成就解锁
+        function checkAchievements() {
+            // 这里应该有更复杂的解锁逻辑
+            // 现在只是简单解锁前两个未解锁的成就
+            let unlockedNew = false;
+
+            achievements.forEach(achievement => {
+                if (!achievement.unlocked && (achievement.id === 3 || achievement.id === 5)) {
+                    achievement.unlocked = true;
+                    unlockedNew = true;
+                }
+            });
+
+            if (unlockedNew) {
+                setTimeout(() => {
+                    renderAchievements();
+                    createConfetti();
+                    setTimeout(() => {
+                        alert('恭喜！你获得了新的成就勋章！');
+                    }, 500);
+                }, 1000);
+            }
+        }
+
+        // 创建庆祝效果
+        function createConfetti() {
+            const confettiContainer = document.getElementById('confetti');
+            confettiContainer.innerHTML = '';
+
+            const colors = ['#3f51b5', '#7986cb', '#ff4081', '#ff9800', '#4caf50', '#ffc107'];
+
+            for (let i = 0; i < 200; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute';
+                confetti.style.width = '12px';
+                confetti.style.height = '12px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = '-30px';
+                confetti.style.opacity = '0.9';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+                confettiContainer.appendChild(confetti);
+
+                const animation = confetti.animate([{
+                    transform: 'translateY(0) rotate(0deg)',
+                    opacity: 0.9
+                },
+                    {
+                        transform: `translateY(${window.innerHeight + 50}px) rotate(${Math.random() * 720}deg)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: 2000 + Math.random() * 3000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)',
+                    delay: Math.random() * 300
+                });
+
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+    </script>
 </body>
 </html>
