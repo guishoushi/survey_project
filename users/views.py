@@ -2,6 +2,7 @@ import json
 from distutils.command.check import check
 
 from django.core.files.locks import unlock
+from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
@@ -180,10 +181,11 @@ class UserDashboardView(LoginRequiredMixin, View):
         if record_list:
 
             for checkin in record_list:
-                finish_ratio += checkin.streak / checkin.habit.goal * 100
-            finish_ratio = round(finish_ratio / len(record_list), 2)
+                finish_ratio += checkin.streak / sum(Habit.objects.all().values_list('goal', flat=True)) * 100
+
+            finish_ratio = round(finish_ratio, 2)
         else:
-            record_list = [1,]
+            record_list = [1, ]
 
         # 计算用户的等级
         if finish_ratio >= 95:
@@ -201,23 +203,18 @@ class UserDashboardView(LoginRequiredMixin, View):
         user_ranking = UserProfile.objects.all()[:3]
         user_list = []
         for user in user_ranking:
-            # user.checkins.all().values_list('streak')
             if user.checkins.all().values_list('streak', flat=True):
+                completion_rate = round(sum(user.checkins.all().values_list('streak', flat=True)) / sum(
+                    Habit.objects.all().values_list('goal', flat=True)) * 100, 2)
+                level = 'A+ 卓越' if completion_rate >= 95 else 'A 优秀' if completion_rate >= 85 else 'B 达标' if completion_rate >= 75 else 'C 发展中' if completion_rate >= 65 else 'D 未达标'
+
                 user_list.append({
                     'username': user.username,
                     'streak': max(user.checkins.all().values_list('streak', flat=True)),
                     'total_number': sum(user.checkins.all().values_list('total_checkins', flat=True)),
                     'unlocked_badge_count': BadgeRecords.objects.filter(user=user).count(),
-                    'completion_rate': round(
-                        sum(user.checkins.all().values_list('streak', flat=True)) / len(user.checkins.all()), 2),
-                    'level': 'D 未达标' if sum(user.checkins.all().values_list('streak', flat=True)) / len(
-                        user.checkins.all()) < 0.5 else 'C 发展中' if sum(
-                        user.checkins.all().values_list('streak', flat=True)) / len(
-                        user.checkins.all()) < 0.75 else 'B 达标' if sum(
-                        user.checkins.all().values_list('streak', flat=True)) / len(
-                        user.checkins.all()) < 0.85 else 'A 优秀' if sum(
-                        user.checkins.all().values_list('streak', flat=True)) / len(
-                        user.checkins.all()) < 0.95 else 'A+ 卓越'
+                    'completion_rate': completion_rate,
+                    'level': level,
                 })
             else:
                 user_list.append({
@@ -228,7 +225,6 @@ class UserDashboardView(LoginRequiredMixin, View):
                     'completion_rate': 0,
                     'level': 'D 未达标'
                 })
-        print(user_list)
 
         def sort_users(users):
             return sorted(users, key=lambda x: (
@@ -247,7 +243,7 @@ class UserDashboardView(LoginRequiredMixin, View):
             'badges': badges_list,
             'total_punches': sum(total_punches),
             'total_badges': total_badges,
-            'finish_ratio': round(finish_ratio / len(record_list), 2),
+            'finish_ratio': finish_ratio,
             'level': level,
             'user_ranking': sorted_users
         }
@@ -305,3 +301,121 @@ class CheckInCreateView(LoginRequiredMixin, View):
             # 说明没有这个习惯，用户第一次打卡这个习惯
             CheckIn.objects.create(user=request.user, habit=habit, date=date.today(), streak=1, total_checkins=1)
             return JsonResponse({'message': '打卡成功！'}, status=200)
+
+
+class RankingListView(LoginRequiredMixin, View):
+    template_name = 'ranking.html'
+
+    def get(self, request):
+        # 渲染用户排行榜
+        user_ranking = UserProfile.objects.all()
+        user_list = []
+        for user in user_ranking:
+            if user.checkins.all().values_list('streak', flat=True):
+                completion_rate = round(
+                    sum(user.checkins.all().values_list('streak', flat=True)) / sum(
+                        Habit.objects.all().values_list('goal', flat=True)) * 100, 2)
+                level = 'A+ 卓越' if completion_rate >= 95 else 'A 优秀' if completion_rate >= 85 else 'B 达标' if completion_rate >= 75 else 'C 发展中' if completion_rate >= 65 else 'D 未达标'
+                user_list.append({
+                    'username': user.username,
+                    'streak': max(user.checkins.all().values_list('streak', flat=True)),
+                    'total_number': sum(user.checkins.all().values_list('total_checkins', flat=True)),
+                    'unlocked_badge_count': BadgeRecords.objects.filter(user=user).count(),
+                    'completion_rate': completion_rate,
+                    'level': level
+                })
+            else:
+                user_list.append({
+                    'username': user.username,
+                    'streak': 0,
+                    'total_number': 0,
+                    'unlocked_badge_count': 0,
+                    'completion_rate': 0,
+                    'level': 'D 未达标'
+                })
+
+        def sort_users(users):
+            return sorted(users, key=lambda x: (
+                -x['completion_rate'],  # 完成率降序（高的在前）
+                -x['streak'],  # 连续打卡天数降序
+                -x['unlocked_badge_count'],  # 解锁徽章数量降序
+                -x['total_number'],  # 总任务数量降序
+                x['username']  # 用户名升序
+            ))
+
+        # 排序并打印结果
+        sorted_users = sort_users(user_list)
+
+        # 查询进7天的打卡人数趋势
+        # 1. 获取日期范围
+        end_date = date.today()
+        start_date = end_date - timedelta(days=6)  # 过去7天（包括今天）
+
+        # 2. 查询并聚合数据
+        daily_users = (
+            CheckIn.objects
+            .filter(date__range=[start_date, end_date])
+            .values('date')  # 按日期分组
+            .annotate(count=Count('user_id', distinct=True))  # 统计独立用户数
+            .order_by('date')
+        )
+
+        # 3. 构建结果字典
+        result_dict = {entry['date']: entry['count'] for entry in daily_users}
+
+        # 4. 补全缺失日期（可选）
+        full_trend = {'date': [], 'count': []}
+        for i in range(7):
+            current_date = start_date + timedelta(days=i)
+            full_trend['date'].append(current_date.strftime('%m-%d'))
+            full_trend['count'].append(result_dict.get(current_date, 0))  # 无数据则返回0
+
+        context = {
+            'user_ranking': sorted_users,
+            'trend': full_trend,
+        }
+        return render(request, self.template_name, context=context)
+
+
+class BadgeListView(LoginRequiredMixin, View):
+    """
+    BadgeListView类继承自LoginRequiredMixin和View类，表示该视图需要登录才能访问。
+    """
+    template_name = 'badges.html'
+
+    def get(self, request):
+        # 渲染勋章的逻辑
+        badges_list = []
+        # 遍历所有的勋章
+        for badge in Badge.objects.all():
+            badge_record = BadgeRecords.objects.filter(badge=badge, user=request.user).first()
+            if badge_record:
+                unlocked = badge_record.unlocked
+                unlock_time = badge_record.unlocked_at.strftime('%Y-%m-%d')
+            else:
+                unlocked = False
+                unlock_time = None
+            badges_list.append({
+                'name': badge.name,  # 名称
+                'icon': badge.icon.url,  # 图标
+                'description': badge.description,  # 描述
+                'required_days': badge.required_days,  # 所需天数解锁
+                'unlocked': unlocked,  # 是否解锁,
+                'habit_name': badge.habit.name,  # 勋章对应的习惯名称,
+                'unlock_time': unlock_time,  # 解锁时间,
+                'days_until_unlock': badge.required_days - CheckIn.objects.filter(user=request.user,
+                                                                                  habit=badge.habit).first().streak,
+                # 还需要多少天解锁
+            })
+            # 统计解锁与未解锁数量
+        unlocked_count = sum(1 for badge in badges_list if badge['unlocked'])
+        locked_count = sum(1 for badge in badges_list if not badge['unlocked'])
+        context = {
+            'badges': badges_list,
+            'user': request.user,
+            'unlocked_count': unlocked_count,
+            'locked_count': locked_count,
+            'completion_rate': round(unlocked_count / len(badges_list) * 100, 2),
+        }
+        print(context)
+        return render(request, self.template_name, context=context)

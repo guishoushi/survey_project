@@ -20,79 +20,103 @@
             --text-primary: #333;
             --text-secondary: #666;
             --divider: rgba(0, 0, 0, 0.1);
+            --nav-bg: rgba(63, 81, 181, 0.95);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+        /* 导航栏样式 */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            z-index: 1000;
+            padding: 0 20px;
         }
 
-        body {
-            background-color: var(--bg-main);
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--text-primary);
-            position: relative;
-            background-image: radial-gradient(circle at 10% 20%, rgba(121, 134, 203, 0.05) 0%, rgba(121, 134, 203, 0) 20%),
-            radial-gradient(circle at 90% 80%, rgba(255, 152, 0, 0.05) 0%, rgba(255, 152, 0, 0) 20%);
-        }
-
-        .container {
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        /* Header - 顶部栏 */
-        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            margin-bottom: 30px;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
         }
 
-        .logo-section {
+        .nav-logo-section {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .logo-circle {
-            width: 50px;
-            height: 50px;
+        .nav-logo-circle {
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             color: white;
         }
 
-        .brand-text h1 {
-            font-size: 1.8rem;
-            color: var(--primary);
+        .nav-brand-text h1 {
+            font-size: 1.7rem;
+            color: white;
             margin-bottom: 2px;
         }
 
-        .brand-text p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+        .nav-brand-text p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
         }
 
-        .user-section {
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 10px 0;
             position: relative;
             display: flex;
             align-items: center;
-            gap: 12px;
-            cursor: pointer;
+            gap: 8px;
+            transition: all 0.3s ease;
         }
 
+        .nav-link:hover {
+            color: #ffec8b;
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .nav-icon {
+            font-size: 1.15rem;
+        }
+
+        /* 导航栏用户信息 */
         .user-avatar {
             width: 46px;
             height: 46px;
@@ -106,19 +130,15 @@
             box-shadow: 0 3px 8px rgba(255, 64, 129, 0.2);
         }
 
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-
         .username {
             font-weight: 600;
             font-size: 1.1rem;
+            color: white;
         }
 
         .user-status {
             font-size: 0.8rem;
-            color: var(--success);
+            color: #4caf50;
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -131,15 +151,15 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: var(--success);
+            background-color: #4caf50;
         }
 
         /* 下拉菜单 */
         .user-dropdown {
             position: absolute;
             top: 110%;
-            right: 0;
-            width: 200px;
+            right: 6%;
+            width: 170px;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -181,11 +201,12 @@
         }
 
         .dropdown-list {
+            padding: 0 20px;
             list-style: none;
         }
 
         .dropdown-item {
-            padding: 10px 20px;
+            padding: 5px;
             font-size: 0.95rem;
             display: flex;
             align-items: center;
@@ -203,6 +224,73 @@
             border-top: 1px solid var(--divider);
             margin-top: 8px;
             padding-top: 14px;
+        }
+
+        /* 移动端菜单按钮 */
+        .mobile-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.6rem;
+            color: white;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            body {
+                padding-top: 120px;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 75px;
+                left: 0;
+                width: 100%;
+                background: var(--nav-bg);
+                flex-direction: column;
+                padding: 20px 0;
+                gap: 5px;
+                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+                transition: clip-path 0.4s ease;
+            }
+
+            .nav-links.active {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+
+            .nav-link {
+                width: 100%;
+                padding: 15px 30px;
+                border-left: 4px solid transparent;
+            }
+
+            .nav-link.active {
+                border-left: 4px solid var(--accent);
+            }
+
+            .nav-link.active::after {
+                display: none;
+            }
+        }
+
+        body {
+            padding-top: 90px;
+            background-color: var(--bg-main);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            position: relative;
+            background-image: radial-gradient(circle at 10% 20%, rgba(121, 134, 203, 0.05) 0%, rgba(121, 134, 203, 0) 20%),
+            radial-gradient(circle at 90% 80%, rgba(255, 152, 0, 0.05) 0%, rgba(255, 152, 0, 0) 20%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 120px auto;
+            padding-top: 20px;
         }
 
         /* 主内容区域 */
@@ -529,28 +617,6 @@
             z-index: 1000;
         }
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .top-bar {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .habits-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-summary {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .user-section {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
 
         .top-section {
             display: flex;
@@ -640,24 +706,44 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <!-- 顶部栏 -->
-    <div class="top-bar">
-        <div class="logo-section">
-            <div class="logo-circle">
+<!-- 导航栏 -->
+<div class="nav-bar">
+    <div class="nav-container">
+        <div class="nav-logo-section">
+            <div class="nav-logo-circle">
                 <i class="fas fa-robot"></i>
             </div>
-            <div class="brand-text">
+            <div class="nav-brand-text">
                 <h1>西点AI好习惯养成系统</h1>
                 <p>趣味打卡 • 成就勋章 • 成长报告 • 智慧养成</p>
             </div>
         </div>
 
+        <!-- 移动端菜单按钮 -->
+        <div class="mobile-toggle">
+            <i class="fas fa-bars" id="menu-toggle"></i>
+        </div>
+
+        <!-- 导航链接 -->
+        <div class="nav-links " id="nav-links">
+            <a href="{% url 'user_dashboard' %}" class="nav-link active">
+                <i class="nav-icon fas fa-home"></i>首页
+            </a>
+            <a href="{% url 'ranking_list' %}" class="nav-link">
+                <i class="nav-icon fas fa-trophy"></i>排行榜
+            </a>
+            <a href="{% url 'badge_list' %}" class="nav-link ">
+                <i class="nav-icon fas fa-medal"></i>成就徽章
+            </a>
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-gift"></i>奖品兑换
+            </a>
+        </div>
+
         <!-- 用户信息区域 -->
         <div class="user-section" id="user-section">
             <div class="user-avatar">
-                <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; border-radius: 10px"></img>
-
+                <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; border-radius: 50%;">
             </div>
             <div class="user-info">
                 <div class="username">{{ user }}</div>
@@ -668,18 +754,18 @@
             <div class="user-dropdown" id="user-dropdown">
                 <div class="dropdown-header">
                     <div class="user-avatar">
-                        <i class="fas fa-child"></i>
+                        <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; border-radius: 50%;">
                     </div>
                     <div>
                         <div class="dropdown-username">{{ user }}</div>
-                        <div class="dropdown-email">{{ user.email }}</div>
+                        <div class="dropdown-email">{{ user.phone }}</div>
                     </div>
                 </div>
                 <ul class="dropdown-list">
                     <li class="dropdown-item">
                         <i class="fas fa-user"></i> 我的账户
                     </li>
-                    <li class="dropdown-item">
+                    <li class="dropdown-item" id="badge_list" %>
                         <i class="fas fa-trophy"></i> 我的成就
                     </li>
                     <li class="dropdown-item logout" id="logout-btn">
@@ -690,6 +776,9 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="container">
 
     <div class="dashboard">
         <!-- 习惯打卡区 -->
@@ -849,7 +938,7 @@
 
             <div class="top-user user-third">
                 <div class="medal">🥉</div>
-               <div class="user-info">
+                <div class="user-info">
                     <h3>{{ user_ranking.2.username }}</h3>
                     <div class="user-days">连续打卡: {{ user_ranking.2.streak }}天</div>
                     <div class="user-days">总打卡: {{ user_ranking.2.total_number }}次</div>
@@ -880,44 +969,52 @@
         const habits = JSON.parse(document.getElementById('habits-data').textContent);
         console.log(habits);
 
-        // 成就数据
-        const achievements = [
-            {
-                id: 1,
-                name: "习惯启动者",
-                icon: "rocket",
-                unlocked: true
-            },
-            {
-                id: 2,
-                name: "坚持小达人",
-                icon: "calendar",
-                unlocked: true
-            }
-        ];
-
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function () {
+            // 导航栏交互
+            const menuToggle = document.getElementById('menu-toggle');
+            const navLinks = document.getElementById('nav-links');
 
-            setupEventListeners();
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    menuToggle.classList.toggle('fa-bars');
+                    menuToggle.classList.toggle('fa-times');
+                });
+            }
 
-            // 用户下拉菜单的切换
+            // 用户下拉菜单
             const userSection = document.getElementById('user-section');
             const userDropdown = document.getElementById('user-dropdown');
 
-            userSection.addEventListener('click', function (e) {
-                // 防止点击子元素时冒泡
-                if (!e.target.closest('.user-dropdown')) {
-                    userDropdown.classList.toggle('show');
-                }
-            });
+            if (userSection && userDropdown) {
+                userSection.addEventListener('click', function (e) {
+                    // 防止点击子元素时冒泡
+                    if (!e.target.closest('.user-dropdown')) {
+                        userDropdown.classList.toggle('show');
+                    }
+                });
 
-            // 点击文档其他区域关闭菜单
-            document.addEventListener('click', function (e) {
-                if (!userSection.contains(e.target)) {
-                    userDropdown.classList.remove('show');
-                }
-            });
+                // 点击文档其他区域关闭菜单
+                document.addEventListener('click', function (e) {
+                    if (!userSection.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+
+                // 点击导航链接时关闭移动端菜单
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 992) {
+                            navLinks.classList.remove('active');
+                            menuToggle.classList.remove('fa-times');
+                            menuToggle.classList.add('fa-bars');
+                        }
+                    });
+                });
+            }
+
+            setupEventListeners();
         });
 
 
@@ -938,8 +1035,12 @@
 
             // 排行榜按钮
             document.getElementById('generate-toplist').addEventListener('click', function () {
-                alert('正在加载排行榜...\n\n🏆 第一名：小明 (98分)\n🥈 第二名：小红 (95分)\n🥉 第三名：小刚 (92分)\n\n你是本月第2名！继续加油！');
+                location.href = '{% url 'ranking_list' %}';
             });
+            // 点击我的成就按钮时
+            document.getElementById('badge_list').addEventListener('click', function () {
+                location.href = '{% url 'badge_list' %}';
+            })
         }
 
         // 打卡功能
@@ -974,9 +1075,6 @@
                 // 显示庆祝特效
                 createConfetti();
 
-                // 检查成就解锁
-                checkAchievements();
-
                 // 更新进度条
                 const parentCard = button.closest('.habit-card');
                 const progressBar = parentCard.querySelector('.progress-bar');
@@ -996,30 +1094,6 @@
                 setTimeout(() => {
                     progressText.textContent = `${Math.floor(progressPercent)}%`;
                 }, 500);
-            }
-        }
-
-        // 检查成就解锁
-        function checkAchievements() {
-            // 这里应该有更复杂的解锁逻辑
-            // 现在只是简单解锁前两个未解锁的成就
-            let unlockedNew = false;
-
-            achievements.forEach(achievement => {
-                if (!achievement.unlocked && (achievement.id === 3 || achievement.id === 5)) {
-                    achievement.unlocked = true;
-                    unlockedNew = true;
-                }
-            });
-
-            if (unlockedNew) {
-                setTimeout(() => {
-                    renderAchievements();
-                    createConfetti();
-                    setTimeout(() => {
-                        alert('恭喜！你获得了新的成就勋章！');
-                    }, 500);
-                }, 1000);
             }
         }
 
@@ -1062,5 +1136,6 @@
             }
         }
     </script>
+</div>
 </body>
 </html>
