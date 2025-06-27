@@ -22,9 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cz7+e769wzq$&cra5&%ke1ofd)!wy-v!ix%(2jnf*2%_*146f='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['192.168.8.78', '127.0.0.1']
+ALLOWED_HOSTS = [
+    '192.168.8.167',
+    '127.0.0.1',
+    '43.134.169.191'
+]
+
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1',
     'http://localhost',
@@ -107,13 +112,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+
+# 这是自定义session的名称
+SESSION_COOKIE_NAME = "session-survey"
+
+# 设置语言代码为简体中文
 LANGUAGE_CODE = 'zh-hans'
 
+# 设置时区为亚洲/上海
 TIME_ZONE = 'Asia/Shanghai'
 
+# 启用国际化支持
 USE_I18N = True
 
+# 启用时区支持
 USE_TZ = True
+
+# 启用本地化支持
+USE_L10N = True
 
 LOGIN_URL = 'user_login'
 # Static files (CSS, JavaScript, Images)

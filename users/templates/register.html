@@ -1,0 +1,646 @@
+{% load  static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册账号 - 成长伙伴</title>
+    <link rel="icon" href="/media/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <script src="{% static 'css/tailwindcss.css' %}"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f1f8e9;
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .btn-gradient {
+            background-image: linear-gradient(to right, #4CAF50, #81C784);
+            transition: all 0.3s ease;
+            background-size: 200% auto;
+        }
+
+        .btn-gradient:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .password-strength {
+            height: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .error-msg {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .error-msg.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .indicator-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #c0c0c0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .success-checkmark {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #dff2e0;
+            margin: 0 auto;
+            animation: scaleCheck 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes scaleCheck {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .input-anim {
+            transition: all 0.3s ease;
+        }
+
+        .input-anim:focus-within {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',    // 绿色：代表成长和积极
+                        secondary: '#FF9800',  // 橙色：代表活力和热情
+                        accent: '#2196F3',     // 蓝色：代表信任和稳定
+                        light: '#F1F8E9',      // 浅绿色：用于背景
+                        dark: '#1B5E20',       // 深绿色：用于强调
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen font-inter overflow-x-hidden">
+<!-- 动态背景容器 -->
+<div id="background" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+<div class="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
+    <!-- 顶部导航 -->
+    <header class="flex justify-between items-center mb-12 pt-4">
+        <div class="flex items-center space-x-2">
+            <div class="w-100 h-10 rounded-full flex items-center justify-center shadow-primary/20">
+                <img src="/media/西点好习惯夏令营-logo.png" style="width: 100%">
+            </div>
+            <h1 class="text-2xl font-bold text-dark">西点好习惯夏令营</h1>
+        </div>
+        <nav class="hidden md:flex items-center space-x-8">
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">首页</a>
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">关于我们</a>
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">帮助中心</a>
+            <a href="#"
+               class="text-gray-600 hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">联系我们</a>
+        </nav>
+        <a href="{% url 'user_login' %}"
+           class="text-gray-600 hover:text-primary transition-colors inline-flex items-center gap-1">
+            <span>登录</span>
+            <i class="fa fa-arrow-right"></i>
+        </a>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex flex-col md:flex-row items-center justify-between gap-8">
+        <!-- 左侧介绍 -->
+        <div class="w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0">
+            <h2 class="text-[clamp(1.8rem,4.5vw,3rem)] font-bold text-dark leading-tight mb-6">
+                开启<span class="text-primary">成长之旅</span>，<br>
+                培养终身好习惯
+            </h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-lg mx-auto md:mx-0">
+                加入50万+青少年成长社区，每天坚持一点点，见证自己的进步！
+            </p>
+
+            <!-- 注册亮点 -->
+            <div class="space-y-6 mb-8">
+                <div class="flex items-start space-x-4 group">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:bg-primary/20">
+                        <i class="fa fa-trophy text-primary text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">个性化成长计划</h3>
+                        <p class="text-gray-600 text-base mt-1">根据你的目标制定专属习惯养成方案</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-4 group">
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:bg-secondary/20">
+                        <i class="fa fa-chart-line text-secondary text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">可视化进步轨迹</h3>
+                        <p class="text-gray-600 text-base mt-1">清晰记录每次进步，看到自己的成长曲线</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-4 group">
+                    <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:bg-accent/20">
+                        <i class="fa fa-user-friends text-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">同龄成长社区</h3>
+                        <p class="text-gray-600 text-base mt-1">与志同道合的小伙伴互相鼓励、共同进步</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 引用评价 -->
+            <div class="bg-white rounded-2xl p-5 shadow-md border border-gray-100 max-w-md">
+                <div class="flex items-center mb-3">
+                    <div class="flex">
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                    </div>
+                    <span class="text-sm text-gray-500 ml-2">5.0 / 500+评价</span>
+                </div>
+                <p class="text-gray-700 italic">
+                    "使用成长伙伴两个月，我的学习效率提高了30%，还养成了早起和阅读的好习惯！"</p>
+                <p class="text-sm text-gray-500 mt-3">—— 小陈，初三学生</p>
+            </div>
+        </div>
+
+        <!-- 右侧注册表单 -->
+        <div class="w-full md:w-5/12">
+            <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 border border-white/50 transform transition-transform duration-500 hover:-translate-y-1.5">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                        <i class="fa fa-user-plus text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">创建新账号</h3>
+                    <p class="text-gray-500">简化流程，快速加入成长伙伴社区</p>
+                </div>
+
+                <!-- 注册表单 -->
+                <form id="registerForm" class="space-y-5" method="post">
+                    <!-- 用户名 -->
+                    <div class="input-anim">
+                        <label for="id_username" class="block text-sm font-medium text-gray-700 mb-2">昵称</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa fa-user text-gray-400"></i>
+                            </div>
+                            {{ form.username }}
+                        </div>
+                        <p id="usernameError" class="text-red-500 text-xs mt-1 opacity-0">
+                            {% if form.username.errors %}
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">好的昵称能让朋友更容易记住你</p>
+                    </div>
+
+                    <!-- 手机号 -->
+                    <div class="input-anim">
+                        <label for="id_phone" class="block text-sm font-medium text-gray-700 mb-2">手机号</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa fa-mobile text-gray-400 text-lg"></i>
+                            </div>
+                            {{ form.phone }}
+                        </div>
+                        <p id="phoneError" class="text-red-500 text-xs mt-1 opacity-0">
+                            {% if form.phone.errors %}
+                                {% for error in form.phone.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- 密码 -->
+                    <div class="input-anim">
+                        <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-2">设置密码</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa fa-lock text-gray-400"></i>
+                            </div>
+                            {{ form.password1 }}
+                            <button type="button" id="togglePassword"
+                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="fa fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1 mt-2">
+                            <div class="password-strength rounded bg-gray-200"></div>
+                            <div class="password-strength rounded bg-gray-200"></div>
+                            <div class="password-strength rounded bg-gray-200"></div>
+                            <div class="password-strength rounded bg-gray-200"></div>
+                        </div>
+                        <p id="password1Error" class="text-red-500 text-xs mt-1 opacity-0">
+                            {% if form.password1.errors %}
+                                {% for error in form.password1.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">建议使用字母、数字和符号的组合</p>
+                    </div>
+
+                    <!-- 确认密码 -->
+                    <div class="input-anim">
+                        <label for="id_password2" class="block text-sm font-medium text-gray-700 mb-2">确认密码</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa fa-lock text-gray-400"></i>
+                            </div>
+                            {{ form.password2 }}
+                        </div>
+                        <p id="passwordMatchError" class="text-red-500 text-xs mt-1 opacity-0">
+                            {% if form.password2.errors %}
+                                {% for error in form.password2.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- 用户协议 -->
+                    <div class="flex items-start mt-4">
+                        <input id="agreement" type="checkbox"
+                               class="mt-1 mr-2 focus:ring-primary h-4 w-4 text-primary rounded">
+                        <label for="agreement" class="text-gray-600 text-sm">
+                            我已阅读并同意 <a href="#" class="text-primary hover:underline">《用户协议》</a> 和 <a
+                                href="#" class="text-primary hover:underline">《隐私政策》</a>
+                        </label>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <button type="submit"
+                            class="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium btn-gradient shadow-lg shadow-primary/20 flex items-center justify-center gap-2 mt-6">
+                        <span>注册账号</span>
+                        <i class="fa fa-user-plus"></i>
+                    </button>
+
+                    <!-- 登录链接 -->
+                    <p class="text-center text-sm text-gray-600 mt-4">
+                        已有账号? <a href="{% url 'user_login' %}"
+                                     class="font-medium text-primary hover:text-dark transition-colors">立即登录</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="mt-12 py-6 border-t border-gray-100/50">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <p class="text-gray-500 text-sm">&copy; 2025 成长伙伴. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // 动态粒子背景
+    function createParticleBackground(container) {
+        // 创建canvas元素
+        const canvas = document.createElement('canvas');
+        container.appendChild(canvas);
+
+        // 设置canvas尺寸
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const particleCount = 100;
+        const colors = ['#4CAF50', '#FF9800', '#2196F3', '#F44336', '#9C27B0', '#FFEB3B', '#E91E63'];
+
+        // 创建粒子
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 3 + 1,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speedX: (Math.random() - 0.5) * 0.5,
+                speedY: (Math.random() - 0.5) * 0.5,
+                opacity: Math.random() * 0.5 + 0.2
+            });
+        }
+
+        // 绘制粒子
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, 'rgba(241, 248, 233, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制粒子
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `${particle.color}${Math.floor(particle.opacity * 255).toString(16)}`;
+                ctx.fill();
+
+                // 更新粒子位置
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+
+                // 边界检测
+                if (particle.x < 0 || particle.x > canvas.width) {
+                    particle.speedX = -particle.speedX;
+                }
+                if (particle.y < 0 || particle.y > canvas.height) {
+                    particle.speedY = -particle.speedY;
+                }
+            });
+
+            // 绘制粒子间的连线
+            particles.forEach(particle => {
+                particles.forEach(otherParticle => {
+                    const dx = particle.x - otherParticle.x;
+                    const dy = particle.y - otherParticle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(particle.x, particle.y);
+                        ctx.lineTo(otherParticle.x, otherParticle.y);
+                        ctx.strokeStyle = `${particle.color}${Math.floor((1 - distance / 100) * particle.opacity * 128).toString(16)}`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    }
+
+    // 显示表单错误信息
+    function showFormErrors() {
+        // 显示Django返回的表单错误
+        {% if form.errors %}
+            // 处理用户名错误
+            {% if form.username.errors %}
+                showError('usernameError', '{% for error in form.username.errors %}{{ error }}{% endfor %}');
+            {% endif %}
+
+            // 处理手机号错误
+            {% if form.phone.errors %}
+                showError('phoneError', '{% for error in form.phone.errors %}{{ error }}{% endfor %}');
+            {% endif %}
+
+            // 处理密码错误
+            {% if form.password1.errors %}
+                showError('password1Error', '{% for error in form.password1.errors %}{{ error }}{% endfor %}');
+            {% endif %}
+
+            // 处理确认密码错误
+            {% if form.password2.errors %}
+                showError('passwordMatchError', '{% for error in form.password2.errors %}{{ error }}{% endfor %}');
+            {% endif %}
+        {% endif %}
+    }
+
+    // 显示错误信息
+    function showError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.textContent = message;
+        errorElement.classList.remove('opacity-0');
+        errorElement.classList.add('opacity-100');
+    }
+
+    // 隐藏错误信息
+    function hideError(elementId) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.classList.remove('opacity-100');
+        errorElement.classList.add('opacity-0');
+    }
+
+    // 显示密码强度
+    function showStrength(bars, strength, colorClass) {
+        for (let i = 0; i < strength; i++) {
+            bars[i].classList.remove('bg-gray-200');
+            bars[i].classList.add(colorClass);
+        }
+    }
+
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function () {
+        // 初始化背景
+        const bgContainer = document.getElementById('background');
+        createParticleBackground(bgContainer);
+
+        // 显示页面
+        document.body.classList.add('loaded');
+
+        // 显示Django表单错误
+        showFormErrors();
+
+        // 获取表单元素
+        const nicknameInput = document.getElementById('id_username');
+        const phoneInput = document.getElementById('id_phone');
+        const passwordInput = document.getElementById('id_password1');
+        const confirmPasswordInput = document.getElementById('id_password2');
+        const togglePassword = document.getElementById('togglePassword');
+
+        // 密码显示/隐藏切换
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // 切换图标
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+
+        // 密码强度检测
+        passwordInput.addEventListener('input', function () {
+            const strengthBars = document.querySelectorAll('.password-strength');
+            const password = this.value;
+            let strength = 0;
+
+            // 重置所有状态条
+            strengthBars.forEach(bar => {
+                bar.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-500');
+                bar.classList.add('bg-gray-200');
+            });
+
+            if (password.length === 0) return;
+
+            // 检查密码长度
+            if (password.length < 6) {
+                showStrength(strengthBars, 1, 'bg-red-500');
+                return;
+            } else {
+                strength++;
+            }
+
+            // 检查是否包含数字
+            if (/\d/.test(password)) {
+                strength++;
+            }
+
+            // 检查是否包含字母
+            if (/[a-zA-Z]/.test(password)) {
+                strength++;
+            }
+
+            // 检查是否包含特殊字符
+            if (/[^a-zA-Z0-9]/.test(password)) {
+                strength++;
+            }
+
+            // 设置强度条
+            if (strength <= 2) {
+                showStrength(strengthBars, strength, 'bg-red-500');
+            } else if (strength === 3) {
+                showStrength(strengthBars, strength, 'bg-yellow-500');
+            } else {
+                showStrength(strengthBars, strength, 'bg-green-500');
+            }
+        });
+
+        // 确认密码验证
+        confirmPasswordInput.addEventListener('input', function () {
+            const password = passwordInput.value;
+            const confirmPassword = this.value;
+            const errorMsg = document.getElementById('passwordMatchError');
+
+            if (password !== confirmPassword && confirmPassword !== '') {
+                showError('passwordMatchError', '两次输入的密码不一致');
+            } else {
+                hideError('passwordMatchError');
+            }
+        });
+
+        // 手机号验证
+        phoneInput.addEventListener('input', function () {
+            const phonePattern = /^1[3-9]\d{9}$/;
+            const errorMsg = document.getElementById('phoneError');
+
+            if (this.value && !phonePattern.test(this.value)) {
+                showError('phoneError', '请输入有效的手机号');
+            } else {
+                hideError('phoneError');
+            }
+        });
+
+        // 表单提交前的前端验证
+        const registerForm = document.getElementById('registerForm');
+        registerForm.addEventListener('submit', function (e) {
+            let isValid = true;
+
+            // 验证手机号格式
+            const phonePattern = /^1[3-9]\d{9}$/;
+            if (!phonePattern.test(phoneInput.value)) {
+                showError('phoneError', '请输入有效的手机号');
+                isValid = false;
+            }
+
+            // 检查密码是否一致
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                showError('passwordMatchError', '两次输入的密码不一致');
+                isValid = false;
+            }
+
+            // 检查密码长度
+            if (passwordInput.value.length < 8) {
+                showError('password1Error', '密码长度至少为8位');
+                isValid = false;
+            }
+
+            // 检查协议是否同意
+            const agreement = document.getElementById('agreement').checked;
+            if (!agreement) {
+                alert('请阅读并同意用户协议和隐私政策');
+                isValid = false;
+            }
+
+            // 如果验证失败，阻止表单提交
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+</body>
+</html>

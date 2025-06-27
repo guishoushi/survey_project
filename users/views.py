@@ -1,20 +1,37 @@
-import json
-from distutils.command.check import check
+import json, os
 
-from django.core.files.locks import unlock
+from django.core.files.storage import default_storage
 from django.db.models import Count
 from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.urls import reverse_lazy
+from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from datetime import date, timedelta
+from datetime import date, timedelta, timezone
+
+from django.views.generic import UpdateView
+
 from .models import UserProfile, Habit, CheckIn, Badge, BadgeRecords
-from .forms import UserRegistrationForm, UserLoginForm, HabitForm, CheckInForm
+from .forms import UserRegistrationForm, UserLoginForm, ProfileForm
+
+
+class UserRegistrationView(View):
+    """用户注册视图"""
+
+    def get(self, request):
+        form = UserRegistrationForm()
+        return render(request, 'register.html', {'form': form})
+
+    def post(self, request):
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, '注册成功！')
+            return redirect('user_dashboard')
+        return render(request, 'register.html', {'form': form})
 
 
 class UserLoginView(View):
@@ -403,9 +420,9 @@ class BadgeListView(LoginRequiredMixin, View):
                 'unlocked': unlocked,  # 是否解锁,
                 'habit_name': badge.habit.name,  # 勋章对应的习惯名称,
                 'unlock_time': unlock_time,  # 解锁时间,
-                'days_until_unlock': badge.required_days - CheckIn.objects.filter(user=request.user,
-                                                                                  habit=badge.habit).first().streak,
-                # 还需要多少天解锁
+                'days_until_unlock': badge.required_days - (record.streak if (
+                    record := CheckIn.objects.filter(user=request.user, habit=badge.habit).first()) else 0),
+                # 使用三元表达式处理记录存在/不存在的情况，还需要多少天解锁
             })
             # 统计解锁与未解锁数量
         unlocked_count = sum(1 for badge in badges_list if badge['unlocked'])
@@ -417,5 +434,121 @@ class BadgeListView(LoginRequiredMixin, View):
             'locked_count': locked_count,
             'completion_rate': round(unlocked_count / len(badges_list) * 100, 2),
         }
-        print(context)
         return render(request, self.template_name, context=context)
+
+
+class UserProfileView(LoginRequiredMixin, View):
+    template_name = 'profile.html'
+
+    def get(self, request):
+        # 获取用户信息
+        user = request.user
+        # 获取用户习惯列表
+        habits = CheckIn.objects.filter(user=user)
+        # 获取用户打卡记录列表
+        checkins = user.checkins.all()
+        # 获取用户解锁的徽章列表
+        badges = user.badge_records.all()
+
+        # 计算用户打卡进度的完成率
+        finish_ratio = 0
+        record_list = CheckIn.objects.filter(user=user)
+        if record_list:
+            for checkin in record_list:
+                finish_ratio += checkin.streak / sum(Habit.objects.all().values_list('goal', flat=True)) * 100
+            finish_ratio = round(finish_ratio, 2)  # 渲染用户信息
+        context = {
+            'user': user,
+            'habits': habits,
+            'checkins': checkins,
+            'badges': badges,
+            'finish_ratio': finish_ratio,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        pass
+
+
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = UserProfile
+    form_class = ProfileForm
+    template_name = 'profile.html'
+    success_url = reverse_lazy('user_profile')
+
+    def get_object(self, queryset=None):
+        """获取当前登录用户"""
+        return self.request.user
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_valid(self, form):
+        """处理表单验证成功的情况"""
+        self.object = form.save()
+
+        # 如果请求是AJAX，返回JSON响应
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'username': self.object.username,
+                'avatar_url': self.object.avatar.url if self.object.avatar else '/static/images/default_avatar.png',
+                'bio': self.object.bio,
+                'message': '账户信息已成功更新！'
+            })
+        # 否则正常重定向
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """处理表单验证失败的情况"""
+        # 如果请求是AJAX，返回带有错误信息的JSON响应
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # 转换表单错误为字段名:错误信息的字典
+            errors = {field: list(error_list)[0] for field, error_list in form.errors.items()}
+            return JsonResponse({'success': False, 'errors': errors})
+
+        # 否则正常处理表单错误
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        """添加上下文数据"""
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        # 添加CSRF令牌到上下文
+        context['csrf_token'] = self.request.COOKIES.get('csrftoken', '')
+        # 连续打卡次数
+        attendance_records = CheckIn.objects.filter(user=self.request.user).values_list('streak', flat=True)
+        context['streak'] = max(attendance_records) if attendance_records else 0
+        # 总打卡次数
+        total_punch_card = CheckIn.objects.filter(user=self.request.user).values_list('total_checkins', flat=True)
+        context['total_checkins'] = max(total_punch_card) if total_punch_card else 0
+        # 解锁的徽章数量
+        unlocked_badge_count = BadgeRecords.objects.filter(user=self.request.user)
+        context['unlocked_badge_count'] = unlocked_badge_count.count()
+        # 渲染勋章的逻辑
+        badges_list = []
+        # 遍历所有的勋章
+        for badge in Badge.objects.all():
+            badge_record = BadgeRecords.objects.filter(badge=badge, user=self.request.user).first()
+            if badge_record:
+                unlocked = badge_record.unlocked
+                unlock_time = badge_record.unlocked_at.strftime('%Y-%m-%d')
+            else:
+                unlocked = False
+                unlock_time = None
+            badges_list.append({
+                'name': badge.name,  # 名称
+                'icon': badge.icon.url,  # 图标
+                'description': badge.description,  # 描述
+                'required_days': badge.required_days,  # 所需天数解锁
+                'unlocked': unlocked,  # 是否解锁,
+                'habit_name': badge.habit.name,  # 勋章对应的习惯名称,
+                'unlock_time': unlock_time,  # 解锁时间,
+                'days_until_unlock': badge.required_days - (record.streak if (
+                    record := CheckIn.objects.filter(user=self.request.user, habit=badge.habit).first()) else 0),
+                # 使用三元表达式处理记录存在/不存在的情况，还需要多少天解锁
+            })
+        context['badges_list'] = badges_list
+        return context

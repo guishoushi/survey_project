@@ -1,10 +1,12 @@
+{% load  static %}
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>西点AI好习惯养成系统 - 成就徽章</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="/media/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href={% static 'css/all.min.css' %}」">
     <style>
         :root {
             --primary: #5e35b1;
@@ -752,7 +754,7 @@
     <div class="nav-container">
         <div class="nav-logo-section">
             <div class="nav-logo-circle">
-                <i class="fas fa-robot"></i>
+                <img src="/media/西点好习惯夏令营-logo.png" style="width: 100%">
             </div>
             <div class="nav-brand-text">
                 <h1>西点AI好习惯养成系统</h1>
@@ -779,13 +781,21 @@
         <!-- 用户信息区域 -->
         <div class="user-section" id="user-section">
             <div class="user-avatar" id="user-avatar">
-                <img src="{{ user.avatar.url }}" alt="User Avatar" style="width: 50px;border-radius: 50%">
+                <img
+                        src="{{ user.avatar.url }}"
+                        alt="用户头像"
+                        style="aspect-ratio: 1/1; width: 100%; object-fit: cover; border-radius: 50%;"
+                >
             </div>
             <!-- 下拉菜单 -->
             <div class="user-dropdown" id="user-dropdown">
                 <div class="dropdown-header">
                     <div class="user-avatar">
-                        <img src="{{ user.avatar.url }}" alt="User Avatar" style="width: 50px;border-radius: 50%">
+                        <img
+                                src="{{ user.avatar.url }}"
+                                alt="用户头像"
+                                style="aspect-ratio: 1/1; width: 100%; object-fit: cover; border-radius: 50%;"
+                        >
                     </div>
                     <div class="dropdown-user-info">
                         <div class="dropdown-username">{{ user.username }}</div>
@@ -794,11 +804,12 @@
                 </div>
                 <ul class="dropdown-list">
                     <li class="dropdown-item">
-                        <i class="fas fa-user"></i> 我的账户
+                        <i class="fas fa-user-cog"></i> <a href="{% url 'user_profile' %}"
+                                                           style="text-decoration: none; color: inherit;"> 我的账户</a>
                     </li>
                     <li class="dropdown-item">
                         <i class="fas fa-trophy"></i> <a href="{% url 'badge_list' %}"
-                                                               style="text-decoration: none; color: inherit;">我的成就</a>
+                                                         style="text-decoration: none; color: inherit;">我的成就</a>
                     </li>
                     <li class="dropdown-item logout" id="logout-button">
                         <i class="fas fa-sign-out-alt"></i> 退出系统

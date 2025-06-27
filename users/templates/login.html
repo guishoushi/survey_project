@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>成长伙伴 - 青少年好习惯打卡</title>
+    <link rel="icon" href="/media/favicon.ico" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- 配置Tailwind自定义颜色和字体 -->
@@ -113,8 +114,8 @@
     <!-- 顶部导航 -->
     <header class="flex justify-between items-center mb-16 pt-4">
         <div class="flex items-center space-x-2">
-            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                <i class="fa fa-leaf text-white text-xl"></i>
+            <div class="w-100 h-100 rounded-full  flex items-center justify-center shadow-primary/20">
+                <img src="/media/西点好习惯夏令营-logo.png" style="width: 100%">
             </div>
             <h1 class="text-2xl font-bold text-dark">西点好习惯夏令营</h1>
         </div>
@@ -280,7 +281,7 @@
                 </form>
 
                 <p class="mt-8 text-center text-sm text-gray-600">
-                    还没有账号? <a href="#"
+                    还没有账号? <a href="{% url 'user_register' %}"
                                    class="font-medium text-primary hover:text-dark transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all">立即注册</a>
                 </p>
             </div>
@@ -422,7 +423,7 @@
         const ctx = canvas.getContext('2d');
         const particles = [];
         const particleCount = 168;
-        const colors = ['#4CAF50', '#FF9800', '#2196F3','#F44336','#9C27B0','#FFEB3B','#E91E63'];
+        const colors = ['#4CAF50', '#FF9800', '#2196F3', '#F44336', '#9C27B0', '#FFEB3B', '#E91E63'];
 
         // 创建粒子
         for (let i = 0; i < particleCount; i++) {

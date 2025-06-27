@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>西点AI好习惯养成系统</title>
+    <link rel="icon" href="/media/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
     <script src="">{% static 'js/chart.js' %}</script>
     <style>
@@ -711,7 +712,7 @@
     <div class="nav-container">
         <div class="nav-logo-section">
             <div class="nav-logo-circle">
-                <i class="fas fa-robot"></i>
+                <img src="/media/西点好习惯夏令营-logo.png" style="width: 100%">
             </div>
             <div class="nav-brand-text">
                 <h1>西点AI好习惯养成系统</h1>
@@ -743,7 +744,11 @@
         <!-- 用户信息区域 -->
         <div class="user-section" id="user-section">
             <div class="user-avatar">
-                <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; border-radius: 50%;">
+                <img
+                        src="{{ user.avatar.url }}"
+                        alt="用户头像"
+                        style="aspect-ratio: 1/1; width: 100%; object-fit: cover; border-radius: 50%;"
+                >
             </div>
             <div class="user-info">
                 <div class="username">{{ user }}</div>
@@ -754,7 +759,11 @@
             <div class="user-dropdown" id="user-dropdown">
                 <div class="dropdown-header">
                     <div class="user-avatar">
-                        <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; border-radius: 50%;">
+                        <img
+                                src="{{ user.avatar.url }}"
+                                alt="用户头像"
+                                style="aspect-ratio: 1/1; width: 100%; object-fit: cover; border-radius: 50%;"
+                        >
                     </div>
                     <div>
                         <div class="dropdown-username">{{ user }}</div>
@@ -763,14 +772,16 @@
                 </div>
                 <ul class="dropdown-list">
                     <li class="dropdown-item">
-                        <i class="fas fa-user"></i> 我的账户
+                        <a href="{% url 'user_profile' %}"
+                           style="text-decoration: none; color: inherit;"> <i class="fas fa-user-cog"></i> 我的账户</a>
                     </li>
-                    <li class="dropdown-item" id="badge_list" %>
+                    <li class="dropdown-item" id="badge_list">
                         <i class="fas fa-trophy"></i> 我的成就
                     </li>
                     <li class="dropdown-item logout" id="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> <a href="{% url 'user_logout' %}"
-                                                               style="text-decoration: none; color: inherit;">退出系统</a>
+                        <a href="{% url 'user_logout' %}"
+                           style="text-decoration: none; color: inherit;"> <i
+                                class="fas fa-sign-out-alt"></i> 退出系统</a>
                     </li>
                 </ul>
             </div>
@@ -956,9 +967,6 @@
     </div>
     <!-- 操作按钮 -->
     <div class="action-buttons">
-        <button class="action-btn report" id="generate-report">
-            <i class="fas fa-download"></i> 生成成长报告
-        </button>
         <button class="action-btn toplist" id="generate-toplist">
             <i class="fas fa-trophy"></i> 排行榜
         </button>
@@ -1026,11 +1034,6 @@
                     const habitId = parseInt(e.target.dataset.id);
                     checkinHabit(habitId, e.target);
                 }
-            });
-
-            // 生成报告按钮
-            document.getElementById('generate-report').addEventListener('click', function () {
-                alert('正在生成本月成长报告...\n请耐心等待片刻！\n\n已完成习惯打卡总数: 27次\n成就勋章解锁: 5项\n总体完成率: 89%');
             });
 
             // 排行榜按钮

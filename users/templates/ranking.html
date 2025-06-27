@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>用户打卡排行榜</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/media/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
     <script src="{% static 'js/chart.js' %}"></script>
     <style>
         /* 全局变量 */
@@ -592,351 +593,353 @@
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <div class="nav-bar">
-        <div class="nav-container">
-            <div class="nav-logo-section">
-                <div class="nav-logo-circle">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div class="nav-brand-text">
-                    <h1>西点AI好习惯养成系统</h1>
-                    <p>趣味打卡 • 成就勋章 • 成长报告 • 智慧养成</p>
-                </div>
+<!-- 导航栏 -->
+<div class="nav-bar">
+    <div class="nav-container">
+        <div class="nav-logo-section">
+            <div class="nav-logo-circle">
+                <img src="/media/西点好习惯夏令营-logo.png" style="width: 100%">
+            </div>
+            <div class="nav-brand-text">
+                <h1>西点AI好习惯养成系统</h1>
+                <p>趣味打卡 • 成就勋章 • 成长报告 • 智慧养成</p>
+            </div>
+        </div>
+
+        <!-- 移动端菜单按钮 -->
+        <div class="mobile-toggle">
+            <i class="fas fa-bars" id="menu-toggle"></i>
+        </div>
+
+        <!-- 导航链接 -->
+        <div class="nav-links" id="nav-links">
+            <a href="{% url 'user_dashboard' %}" class="nav-link">
+                <i class="nav-icon fas fa-home"></i>首页
+            </a>
+
+            <a href="{% url 'ranking_list' %}" class="nav-link active">
+                <i class="nav-icon fas fa-trophy"></i>排行榜
+            </a>
+            <a href="{% url 'badge_list' %}" class="nav-link">
+                <i class="nav-icon fas fa-medal"></i>成就徽章
+            </a>
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-gift"></i>奖品兑换
+            </a>
+        </div>
+
+        <!-- 用户信息区域 -->
+        <div class="user-section" id="user-section">
+            <div class="user-avatar">
+                <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="user-info">
+                <div class="username">{{ user }}</div>
+                <div class="user-status">在线</div>
             </div>
 
-            <!-- 移动端菜单按钮 -->
-            <div class="mobile-toggle">
-                <i class="fas fa-bars" id="menu-toggle"></i>
-            </div>
-
-            <!-- 导航链接 -->
-            <div class="nav-links" id="nav-links">
-                <a href="{% url 'user_dashboard' %}" class="nav-link">
-                    <i class="nav-icon fas fa-home"></i>首页
-                </a>
-
-                <a href="{% url 'ranking_list' %}" class="nav-link active">
-                    <i class="nav-icon fas fa-trophy"></i>排行榜
-                </a>
-                <a href="{% url 'badge_list' %}" class="nav-link">
-                    <i class="nav-icon fas fa-medal"></i>成就徽章
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-gift"></i>奖品兑换
-                </a>
-            </div>
-
-            <!-- 用户信息区域 -->
-            <div class="user-section" id="user-section">
-                <div class="user-avatar">
-                    <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div class="user-info">
-                    <div class="username">{{ user }}</div>
-                    <div class="user-status">在线</div>
-                </div>
-
-                <!-- 下拉菜单 -->
-                <div class="user-dropdown" id="user-dropdown">
-                    <div class="dropdown-header">
-                        <div class="user-avatar">
-                            <img src="{{ user.avatar.url }}" alt="用户头像" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div>
-                            <div class="dropdown-username">{{ user }}</div>
-                            <div class="dropdown-email">{{ user.phone }}</div>
-                        </div>
+            <!-- 下拉菜单 -->
+            <div class="user-dropdown" id="user-dropdown">
+                <div class="dropdown-header">
+                    <div class="user-avatar">
+                        <img src="{{ user.avatar.url }}" alt="用户头像"
+                             style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
-                    <ul class="dropdown-list">
-                        <li class="dropdown-item">
-                            <i class="fas fa-user"></i> 我的账户
-                        </li>
-                        <li class="dropdown-item">
-                            <i class="fas fa-trophy"></i> <a href="{% url 'badge_list' %}"
-                                                               style="text-decoration: none; color: inherit;">我的成就</a>
-                        </li>
-                        <li class="dropdown-item logout" id="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i> <a href="{% url 'user_logout' %}"
+                    <div>
+                        <div class="dropdown-username">{{ user }}</div>
+                        <div class="dropdown-email">{{ user.phone }}</div>
+                    </div>
+                </div>
+                <ul class="dropdown-list">
+                    <li class="dropdown-item">
+                        <i class="fas fa-user-cog"></i> <a href="{% url 'user_profile' %}"
+                                                           style="text-decoration: none; color: inherit;">我的账户</a>
+                    </li>
+                    <li class="dropdown-item">
+                        <i class="fas fa-trophy"></i> <a href="{% url 'badge_list' %}"
+                                                         style="text-decoration: none; color: inherit;">我的成就</a>
+                    </li>
+                    <li class="dropdown-item logout" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> <a href="{% url 'user_logout' %}"
                                                                style="text-decoration: none; color: inherit;">退出系统</a>
-                        </li>
-                    </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 页面内容 -->
+<div class="container">
+    <header>
+        <h1>用户打卡排行榜</h1>
+        <p>坚持每日打卡，养成良好习惯！前三名用户可获得丰厚奖励</p>
+        <div class="ribbon">💎 积分可兑换精美礼品 💎</div>
+    </header>
+
+    <div class="top-section">
+        <div class="top-users">
+            <h2>前三名用户</h2>
+
+            <div class="top-user user-first">
+                <div class="medal">🥇</div>
+                <div class="user-info">
+                    <h3>{{ user_ranking.0.username }}</h3>
+                    <div class="user-days">连续打卡: {{ user_ranking.0.streak }}天</div>
+                    <div class="user-days">总打卡: {{ user_ranking.0.total_number }}天</div>
+                    <div class="user-days">解锁徽章: {{ user_ranking.0.unlocked_badge_count }}个</div>
+                    <div class="user-days">完成率: {{ user_ranking.0.completion_rate }}%</div>
                 </div>
+                <button class="redeem-btn">兑换奖品</button>
+            </div>
+
+            <div class="top-user user-second">
+                <div class="medal">🥈</div>
+                <div class="user-info">
+                    <h3>{{ user_ranking.1.username }}</h3>
+                    <div class="user-days">连续打卡: {{ user_ranking.1.streak }}天</div>
+                    <div class="user-days">总打卡: {{ user_ranking.1.total_number }}天</div>
+                    <div class="user-days">解锁徽章: {{ user_ranking.1.unlocked_badge_count }}个</div>
+                    <div class="user-days">完成率: {{ user_ranking.1.completion_rate }}%</div>
+                </div>
+                <button class="redeem-btn">兑换奖品</button>
+            </div>
+
+            <div class="top-user user-third">
+                <div class="medal">🥉</div>
+                <div class="user-info">
+                    <h3>{{ user_ranking.2.username }}</h3>
+                    <div class="user-days">连续打卡: {{ user_ranking.2.streak }}天</div>
+                    <div class="user-days">总打卡: {{ user_ranking.2.total_number }}天</div>
+                    <div class="user-days">解锁徽章: {{ user_ranking.2.unlocked_badge_count }}个</div>
+                    <div class="user-days">完成率: {{ user_ranking.2.completion_rate }}%</div>
+                </div>
+                <button class="redeem-btn">兑换奖品</button>
+            </div>
+        </div>
+
+        <div class="stats-box">
+            <h2>打卡数据分析</h2>
+            <div class="chart-container">
+                <canvas id="statsChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- 页面内容 -->
-    <div class="container">
-        <header>
-            <h1>用户打卡排行榜</h1>
-            <p>坚持每日打卡，养成良好习惯！前三名用户可获得丰厚奖励</p>
-            <div class="ribbon">💎 积分可兑换精美礼品 💎</div>
-        </header>
-
-        <div class="top-section">
-            <div class="top-users">
-                <h2>前三名用户</h2>
-
-                <div class="top-user user-first">
-                    <div class="medal">🥇</div>
-                    <div class="user-info">
-                        <h3>{{ user_ranking.0.username }}</h3>
-                        <div class="user-days">连续打卡: {{ user_ranking.0.streak }}天</div>
-                        <div class="user-days">总打卡: {{ user_ranking.0.total_number }}天</div>
-                        <div class="user-days">解锁徽章: {{ user_ranking.0.unlocked_badge_count }}个</div>
-                        <div class="user-days">完成率: {{ user_ranking.0.completion_rate }}%</div>
-                    </div>
-                    <button class="redeem-btn">兑换奖品</button>
-                </div>
-
-                <div class="top-user user-second">
-                    <div class="medal">🥈</div>
-                    <div class="user-info">
-                        <h3>{{ user_ranking.1.username }}</h3>
-                        <div class="user-days">连续打卡: {{ user_ranking.1.streak }}天</div>
-                        <div class="user-days">总打卡: {{ user_ranking.1.total_number }}天</div>
-                        <div class="user-days">解锁徽章: {{ user_ranking.1.unlocked_badge_count }}个</div>
-                        <div class="user-days">完成率: {{ user_ranking.1.completion_rate }}%</div>
-                    </div>
-                    <button class="redeem-btn">兑换奖品</button>
-                </div>
-
-                <div class="top-user user-third">
-                    <div class="medal">🥉</div>
-                    <div class="user-info">
-                        <h3>{{ user_ranking.2.username }}</h3>
-                        <div class="user-days">连续打卡: {{ user_ranking.2.streak }}天</div>
-                        <div class="user-days">总打卡: {{ user_ranking.2.total_number }}天</div>
-                        <div class="user-days">解锁徽章: {{ user_ranking.2.unlocked_badge_count }}个</div>
-                        <div class="user-days">完成率: {{ user_ranking.2.completion_rate }}%</div>
-                    </div>
-                    <button class="redeem-btn">兑换奖品</button>
-                </div>
-            </div>
-
-            <div class="stats-box">
-                <h2>打卡数据分析</h2>
-                <div class="chart-container">
-                    <canvas id="statsChart"></canvas>
-                </div>
-            </div>
+    <div class="ranking-container">
+        <div class="ranking-header">
+            <h2>完整排行榜</h2>
         </div>
 
-        <div class="ranking-container">
-            <div class="ranking-header">
-                <h2>完整排行榜</h2>
-            </div>
-
-            <table class="ranking-table">
-                <thead>
+        <table class="ranking-table">
+            <thead>
+            <tr>
+                <th>排名</th>
+                <th>用户名</th>
+                <th>连续打卡(天)</th>
+                <th>累计天数</th>
+                <th>完成率</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for foo in user_ranking %}
                 <tr>
-                    <th>排名</th>
-                    <th>用户名</th>
-                    <th>连续打卡(天)</th>
-                    <th>累计天数</th>
-                    <th>完成率</th>
-                    <th>操作</th>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ foo.username }}</td>
+                    <td>{{ foo.streak }}</td>
+                    <td>{{ foo.total_number }}</td>
+                    <td>{{ foo.completion_rate }}%</td>
+                    <td>
+                        <button class="redeem-btn">兑换</button>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for foo in user_ranking %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ foo.username }}</td>
-                        <td>{{ foo.streak }}</td>
-                        <td>{{ foo.total_number }}</td>
-                        <td>{{ foo.completion_rate }}%</td>
-                        <td>
-                            <button class="redeem-btn">兑换</button>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-        <div class="prizes-section">
-            <h2>可兑换奖品</h2>
-            <div class="prizes-container">
-                <div class="prize-card">
-                    <h3>🏆 金牌会员奖励</h3>
-                    <p>奖励对象：第1名</p>
-                    <p>连续打卡：30天</p>
-                    <p>豪华礼品套餐（价值 ¥800）</p>
-                    <p>专享会员资格12个月</p>
-                    <p>优先客服支持</p>
-                </div>
-
-                <div class="prize-card">
-                    <h3>🥈 银牌会员奖励</h3>
-                    <p>奖励对象：第2名</p>
-                    <p>连续打卡：30天</p>
-                    <p>精美礼品套餐（价值 ¥500）</p>
-                    <p>专享会员资格6个月</p>
-                    <p>高级客服支持</p>
-                </div>
-
-                <div class="prize-card">
-                    <h3>🥉 铜牌会员奖励</h3>
-                    <p>奖励对象：第3名</p>
-                    <p>连续打卡：30天</p>
-                    <p>实用礼品套餐（价值 ¥300）</p>
-                    <p>专享会员资格3个月</p>
-                    <p>专属客服支持</p>
-                </div>
+    <div class="prizes-section">
+        <h2>可兑换奖品</h2>
+        <div class="prizes-container">
+            <div class="prize-card">
+                <h3>🏆 金牌会员奖励</h3>
+                <p>奖励对象：第1名</p>
+                <p>连续打卡：30天</p>
+                <p>豪华礼品套餐（价值 ¥800）</p>
+                <p>专享会员资格12个月</p>
+                <p>优先客服支持</p>
             </div>
-        </div>
 
-        <div class="footer">
-            <p>© 2025 每日打卡系统 | 打卡成就更好的自己</p>
-            <p>连续打卡21天以上可获得额外积分奖励</p>
+            <div class="prize-card">
+                <h3>🥈 银牌会员奖励</h3>
+                <p>奖励对象：第2名</p>
+                <p>连续打卡：30天</p>
+                <p>精美礼品套餐（价值 ¥500）</p>
+                <p>专享会员资格6个月</p>
+                <p>高级客服支持</p>
+            </div>
+
+            <div class="prize-card">
+                <h3>🥉 铜牌会员奖励</h3>
+                <p>奖励对象：第3名</p>
+                <p>连续打卡：30天</p>
+                <p>实用礼品套餐（价值 ¥300）</p>
+                <p>专享会员资格3个月</p>
+                <p>专属客服支持</p>
+            </div>
         </div>
     </div>
 
-    <script>
-        // 导航栏交互脚本
-        document.addEventListener('DOMContentLoaded', function() {
-            // 移动端菜单切换
-            const menuToggle = document.getElementById('menu-toggle');
-            const navLinks = document.getElementById('nav-links');
+    <div class="footer">
+        <p>© 2025 每日打卡系统 | 打卡成就更好的自己</p>
+        <p>连续打卡21天以上可获得额外积分奖励</p>
+    </div>
+</div>
 
-            if (menuToggle && navLinks) {
-                menuToggle.addEventListener('click', () => {
-                    navLinks.classList.toggle('active');
-                    menuToggle.classList.toggle('fa-bars');
-                    menuToggle.classList.toggle('fa-times');
-                });
-            }
+<script>
+    // 导航栏交互脚本
+    document.addEventListener('DOMContentLoaded', function () {
+        // 移动端菜单切换
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
 
-            // 用户下拉菜单
-            const userSection = document.getElementById('user-section');
-            const userDropdown = document.getElementById('user-dropdown');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                menuToggle.classList.toggle('fa-bars');
+                menuToggle.classList.toggle('fa-times');
+            });
+        }
 
-            if (userSection && userDropdown) {
-                userSection.addEventListener('click', function(e) {
-                    // 防止点击子元素时冒泡
-                    if (!e.target.closest('.user-dropdown')) {
-                        userDropdown.classList.toggle('show');
+        // 用户下拉菜单
+        const userSection = document.getElementById('user-section');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        if (userSection && userDropdown) {
+            userSection.addEventListener('click', function (e) {
+                // 防止点击子元素时冒泡
+                if (!e.target.closest('.user-dropdown')) {
+                    userDropdown.classList.toggle('show');
+                }
+            });
+
+            // 点击文档其他区域关闭菜单
+            document.addEventListener('click', function (e) {
+                if (!userSection.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+
+            // 点击导航链接时关闭移动端菜单
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 992) {
+                        navLinks.classList.remove('active');
+                        menuToggle.classList.remove('fa-times');
+                        menuToggle.classList.add('fa-bars');
                     }
                 });
+            });
+        }
 
-                // 点击文档其他区域关闭菜单
-                document.addEventListener('click', function(e) {
-                    if (!userSection.contains(e.target)) {
-                        userDropdown.classList.remove('show');
-                    }
-                });
+        // 打卡统计图表
+        const ctx = document.getElementById('statsChart');
+        if (ctx) {
+            const trendData = {
+                labels: {{ trend.date|safe }},
+                datasets: [{
+                    label: '打卡人数趋势',
+                    data: {{ trend.count }},
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.4
+                }]
+            };
 
-                // 点击导航链接时关闭移动端菜单
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.addEventListener('click', () => {
-                        if (window.innerWidth <= 992) {
-                            navLinks.classList.remove('active');
-                            menuToggle.classList.remove('fa-times');
-                            menuToggle.classList.add('fa-bars');
+            const config = {
+                type: 'line',
+                data: trendData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '每周打卡人数统计',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
                         }
-                    });
-                });
-            }
-
-            // 打卡统计图表
-            const ctx = document.getElementById('statsChart');
-            if (ctx) {
-                const trendData = {
-                    labels: {{ trend.date|safe }},
-                    datasets: [{
-                        label: '打卡人数趋势',
-                        data: {{ trend.count }},
-                        fill: true,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgb(54, 162, 235)',
-                        tension: 0.4
-                    }]
-                };
-
-                const config = {
-                    type: 'line',
-                    data: trendData,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    font: {
-                                        size: 14
-                                    }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 12
                                 }
                             },
                             title: {
                                 display: true,
-                                text: '每周打卡人数统计',
+                                text: '打卡人数',
                                 font: {
-                                    size: 16,
+                                    size: 14,
                                     weight: 'bold'
                                 }
                             }
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    font: {
-                                        size: 12
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: '打卡人数',
-                                    font: {
-                                        size: 14,
-                                        weight: 'bold'
-                                    }
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12
                                 }
                             },
-                            x: {
-                                ticks: {
-                                    font: {
-                                        size: 12
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: '日期',
-                                    font: {
-                                        size: 14,
-                                        weight: 'bold'
-                                    }
+                            title: {
+                                display: true,
+                                text: '日期',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
                                 }
                             }
                         }
                     }
-                };
+                }
+            };
 
-                new Chart(ctx, config);
-            }
+            new Chart(ctx, config);
+        }
 
-            // 兑换按钮功能
-            document.querySelectorAll('.redeem-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    // 获取用户信息
-                    const userRow = this.closest('.top-user') || this.closest('tr');
-                    let userName = '';
+        // 兑换按钮功能
+        document.querySelectorAll('.redeem-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                // 获取用户信息
+                const userRow = this.closest('.top-user') || this.closest('tr');
+                let userName = '';
 
-                    if (userRow.querySelector('h3')) {
-                        userName = userRow.querySelector('h3').textContent;
-                    } else if (userRow.querySelector('.username')) {
-                        userName = userRow.querySelector('.username').textContent;
-                    } else {
-                        userName = "用户";
-                    }
+                if (userRow.querySelector('h3')) {
+                    userName = userRow.querySelector('h3').textContent;
+                } else if (userRow.querySelector('.username')) {
+                    userName = userRow.querySelector('.username').textContent;
+                } else {
+                    userName = "用户";
+                }
 
-                    // 显示兑换信息
-                    alert(`兑换奖品申请已提交！\n${userName}用户，请查收系统消息确认兑换细节。`);
-                });
+                // 显示兑换信息
+                alert(`兑换奖品申请已提交！\n${userName}用户，请查收系统消息确认兑换细节。`);
             });
         });
-    </script>
+    });
+</script>
 </body>
 </html>
